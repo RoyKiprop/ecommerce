@@ -8,6 +8,7 @@ defmodule EcommerceWeb.Layouts do
   layout on both `use EcommerceWeb, :controller` and
   `use EcommerceWeb, :live_view`.
   """
+
   use EcommerceWeb, :html
 
   embed_templates "layouts/*"

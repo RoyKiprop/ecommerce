@@ -1,0 +1,76 @@
+<header class="bg-gray-100">
+  <div class="px-32 py-10 flex justify-between items-center ">
+    <.logo />
+    <.filter />
+    <div class="flex justify-end  space-x-5 w-[10%] ">
+      <.user current_user={@current_user} />
+      <.cart />
+    </div>
+  </div>
+  <div class="px-32 flex justify-between items-center">
+    <.category />
+    <div>
+      <ul class="flex items-center gap-10">
+        <li>
+          <.link
+            href="/"
+            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            role="navigation"
+            method="get"
+          >
+            Home
+          </.link>
+        </li>
+
+        <li>
+          <.link
+            href="/"
+            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            role="navigation"
+            method="get"
+          >
+            Shop
+          </.link>
+        </li>
+
+        <li>
+          <.link
+            href="/"
+            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            role="navigation"
+            method="get"
+          >
+            About Us
+          </.link>
+        </li>
+
+        <li>
+          <.link
+            href="/"
+            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            role="navigation"
+            method="get"
+          >
+            Blog
+          </.link>
+        </li>
+
+        <li>
+          <.link
+            href="/"
+            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            role="navigation"
+            method="get"
+          >
+            Contact Us
+          </.link>
+        </li>
+      </ul>
+    </div>
+    <.flash_sale />
+  </div>
+</header>
+<body>
+  <.flash_group flash={@flash} />
+  <%= @inner_content %>
+</body>

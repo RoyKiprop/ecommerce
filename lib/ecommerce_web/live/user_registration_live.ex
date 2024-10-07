@@ -50,6 +50,8 @@ defmodule EcommerceWeb.UserRegistrationLive do
       |> assign(trigger_submit: false, check_errors: false)
       |> assign_form(changeset)
 
+    IO.inspect("Hello world")
+
     {:ok, socket, temporary_assigns: [form: nil]}
   end
 

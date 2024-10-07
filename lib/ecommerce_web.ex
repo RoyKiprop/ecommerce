@@ -85,6 +85,7 @@ defmodule EcommerceWeb do
       import Phoenix.HTML
       # Core UI components and translation
       import EcommerceWeb.CoreComponents
+      import EcommerceWeb.HeaderComponent
       import EcommerceWeb.Gettext
 
       # Shortcut for generating JS commands
