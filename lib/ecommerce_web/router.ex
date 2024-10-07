@@ -66,6 +66,10 @@ defmodule EcommerceWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{EcommerceWeb.UserAuth, :ensure_authenticated}] do
+      live "/products", ProductLive.Index, :index
+      live "/products/new", ProductLive.Index, :new
+      live "/categories", CategoryLive.Index, :index
+      live "/categories/new", CategoryLive.Index, :new
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end

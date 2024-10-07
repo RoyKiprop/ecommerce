@@ -191,6 +191,69 @@ defmodule EcommerceWeb.HeaderComponent do
     """
   end
 
+  def navigation(assigns) do
+    ~H"""
+    <div>
+      <ul class="flex items-center gap-10">
+        <li>
+          <.link
+            href="/"
+            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            role="navigation"
+            method="get"
+          >
+            Home
+          </.link>
+        </li>
+
+        <li>
+          <.link
+            href="/"
+            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            role="navigation"
+            method="get"
+          >
+            Shop
+          </.link>
+        </li>
+
+        <li>
+          <.link
+            href="/"
+            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            role="navigation"
+            method="get"
+          >
+            About Us
+          </.link>
+        </li>
+
+        <li>
+          <.link
+            href="/"
+            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            role="navigation"
+            method="get"
+          >
+            Blog
+          </.link>
+        </li>
+
+        <li>
+          <.link
+            href="/"
+            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            role="navigation"
+            method="get"
+          >
+            Contact Us
+          </.link>
+        </li>
+      </ul>
+    </div>
+    """
+  end
+
   def flash_sale(assigns) do
     ~H"""
     <div class="flex items-center">
