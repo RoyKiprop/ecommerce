@@ -197,7 +197,7 @@ defmodule EcommerceWeb.HeaderComponent do
       <ul class="flex items-center gap-10">
         <li>
           <.link
-            href="/"
+            navigate="/"
             class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
             role="navigation"
             method="get"
@@ -208,7 +208,7 @@ defmodule EcommerceWeb.HeaderComponent do
 
         <li>
           <.link
-            href="/"
+            navigate="/shop"
             class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
             role="navigation"
             method="get"
