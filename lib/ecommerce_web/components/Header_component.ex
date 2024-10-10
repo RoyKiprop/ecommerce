@@ -53,29 +53,14 @@ defmodule EcommerceWeb.HeaderComponent do
               role="menuitem"
               tabindex="-1"
               method="get"
-              id="user-menu-item-0"
             >
               My Account
             </.link>
 
-            <.link
-              href="#"
-              class="  pb-3 border-gray-500"
-              role="menuitem"
-              tabindex="-1"
-              method="get"
-              id="user-menu-item-2"
-            >
+            <.link href="#" class="  pb-3 border-gray-500" role="menuitem" tabindex="-1" method="get">
               Settings
             </.link>
-            <.link
-              navigate="/users/log_in"
-              class=""
-              role="menuitem"
-              tabindex="-1"
-              method="get"
-              id="user-menu-item-3"
-            >
+            <.link navigate="/users/log_in" class="" role="menuitem" tabindex="-1" method="get">
               Sign Out
             </.link>
           </div>
@@ -87,18 +72,10 @@ defmodule EcommerceWeb.HeaderComponent do
               role="menuitem"
               tabindex="-1"
               method="get"
-              id="user-menu-item-0"
             >
               Sign In
             </.link>
-            <.link
-              navigate="/users/register"
-              class=""
-              role="menuitem"
-              tabindex="-1"
-              method="get"
-              id="user-menu-item-1"
-            >
+            <.link navigate="/users/register" class="" role="menuitem" tabindex="-1" method="get">
               Register
             </.link>
           </div>

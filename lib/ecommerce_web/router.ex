@@ -1,6 +1,5 @@
 defmodule EcommerceWeb.Router do
   use EcommerceWeb, :router
-
   import EcommerceWeb.UserAuth
 
   pipeline :browser do
@@ -46,7 +45,6 @@ defmodule EcommerceWeb.Router do
   end
 
   ## Authentication routes
-
   scope "/", EcommerceWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
@@ -82,11 +80,11 @@ defmodule EcommerceWeb.Router do
 
     live_session :current_user,
       on_mount: [{EcommerceWeb.UserAuth, :mount_current_user}] do
-      live "/shop", ProductLive
-      live "/shop/:id", ShopLive.ProductDetailsLive
-
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+      live "/shop", ProductLive, :index
+      live "/shop/:id", ShopLive.ProductDetailsLive, :show
+      live "/cart", CartLive, :index
     end
   end
 end

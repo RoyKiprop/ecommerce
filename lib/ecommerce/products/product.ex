@@ -9,8 +9,11 @@ defmodule Ecommerce.Products.Product do
     field :currency, :string
     field :color, :string
     field :price, :decimal
+    field :discount, :decimal
     field :stock, :integer
+
     belongs_to :category, Ecommerce.Products.Category
+    has_many :order_items, Ecommerce.Order_Items.Order_Item
 
     timestamps(type: :utc_datetime)
   end
@@ -18,7 +21,17 @@ defmodule Ecommerce.Products.Product do
   @doc false
   def changeset(product, attrs) do
     product
-    |> cast(attrs, [:name, :description, :price, :currency, :color, :image, :stock, :category_id])
+    |> cast(attrs, [
+      :name,
+      :description,
+      :price,
+      :currency,
+      :color,
+      :image,
+      :stock,
+      :category_id,
+      :discount
+    ])
     |> validate_required([:name, :description, :price, :currency, :color, :image, :stock])
   end
 end

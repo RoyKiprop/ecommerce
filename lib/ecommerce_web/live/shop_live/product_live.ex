@@ -28,17 +28,7 @@ defmodule EcommerceWeb.ProductLive do
               </p>
               <p class="font-semibold text-[#fe735e] mb-2 text-left">
                 <%= product.price %>
-                <!-- Adjust according to the currency format if needed -->
               </p>
-              <div class="mt-2 text-left">
-                <button
-                  phx-click="add_to_cart"
-                  phx-value-id={product.id}
-                  class="bg-[#fe735e] text-white font-bold py-2 px-4 rounded hover:bg-[#fe6a4f] transition-colors duration-200"
-                >
-                  Add to Cart
-                </button>
-              </div>
             </div>
           </div>
         <% end %>

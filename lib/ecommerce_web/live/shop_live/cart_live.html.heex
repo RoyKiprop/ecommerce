@@ -1,0 +1,70 @@
+~H"""
+<div class="min-h-screen bg-gray-100 p-4 lg:flex lg:space-x-4">
+  <!-- Cart Section -->
+  <div class="w-full lg:w-2/3 bg-white p-6 shadow-lg rounded-lg">
+    <h2 class="text-2xl font-semibold mb-4">Items</h2>
+
+    <%= for item <- @cart_items do %>
+      <div class="flex items-center space-x-4 border-b pb-4 mb-4">
+        <img
+          src={item.product.image}
+          alt={item.product.name}
+          class="w-20 h-20 rounded-lg object-cover"
+        />
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold"><%= item.product.name %></h3>
+          <p class="text-gray-500">Price: <%= item.product.price %></p>
+
+          <div class="flex items-center mt-2 space-x-2">
+            <input
+              type="number"
+              min="1"
+              value={item.quantity}
+              phx-change="update_quantity"
+              phx-value-id={item.id}
+              class="w-16 p-1 border border-gray-300 rounded-lg"
+            />
+            <button phx-click="remove_item" phx-value-id={item.id} class="text-red-600">
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="mt-4">
+      <label for="promo_code" class="block mb-2">Promo code</label>
+      <input
+        type="text"
+        id="promo_code"
+        placeholder="Enter your promo code"
+        value={@promo_code}
+        class="w-full p-2 border border-gray-300 rounded-lg mb-4"
+        phx-change="apply_promo_code"
+      />
+      <button class="bg-[#fe735e] text-white py-2 px-6 rounded-lg w-full">
+        Proceed to checkout
+      </button>
+    </div>
+  </div>
+  <!-- Recommendations Section -->
+  <div class="w-full lg:w-1/3 mt-6 lg:mt-0">
+    <h2 class="text-2xl font-semibold mb-4">Recommended for you</h2>
+
+    <%= for recommended_item <- @recommended_items do %>
+      <div class="flex items-center space-x-4 mb-4">
+        <img
+          src={recommended_item.image}
+          alt={recommended_item.name}
+          class="w-20 h-20 rounded-lg object-cover"
+        />
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold"><%= recommended_item.name %></h3>
+          <p class="text-gray-500">€<%= recommended_item.price %></p>
+        </div>
+        <button class="bg-[#fe735e] text-white py-2 px-4 rounded-lg">Add</button>
+      </div>
+    <% end %>
+  </div>
+</div>
+"""

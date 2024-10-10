@@ -3,12 +3,14 @@ defmodule Ecommerce.Orders.Order do
   import Ecto.Changeset
 
   schema "orders" do
-    field :status, :string
+    field :status, :string, default: "cart"
     field :total, :decimal
     field :sub_total, :decimal
     field :discount, :decimal
     field :tax, :decimal
     field :shipping, :decimal
+    has_many :order_items, Ecommerce.Order_Items.Order_Item
+    belongs_to :user, Ecommerce.Accounts.User
 
     timestamps(type: :utc_datetime)
   end
@@ -16,7 +18,7 @@ defmodule Ecommerce.Orders.Order do
   @doc false
   def changeset(order, attrs) do
     order
-    |> cast(attrs, [:status, :sub_total, :discount, :tax, :shipping, :total])
-    |> validate_required([:status, :sub_total, :discount, :tax, :shipping, :total])
+    |> cast(attrs, [:user_id, :status, :sub_total, :discount, :tax, :shipping, :total])
+    |> validate_required([:status])
   end
 end

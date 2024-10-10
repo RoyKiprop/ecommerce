@@ -1,10 +1,52 @@
 defmodule EcommerceWeb.ShopLive.ProductDetailsLive do
   use EcommerceWeb, :live_view
   alias Ecommerce.Products
+  alias Ecommerce.Cart
+  alias Ecommerce.Accounts
 
-  def mount(%{"id" => id}, _session, socket) do
+  def mount(%{"id" => id}, session, socket) do
     product = Products.get_product!(id)
-    {:ok, assign(socket, product: product)}
+
+    current_user =
+      case session["user_token"] do
+        nil ->
+          nil
+
+        token ->
+          Accounts.get_user_by_session_token(token)
+      end
+
+    # Initialize total_items to 0 if there's no user or no cart
+    total_items =
+      case current_user do
+        nil -> 0
+        %{} -> Cart.count_cart_items(current_user.id)
+      end
+
+    # Assign product, current_user, and total_items to the socket
+    {:ok, assign(socket, product: product, current_user: current_user, total_items: total_items)}
+  end
+
+  def handle_event("add-to-cart", %{"id" => id}, socket) do
+    case socket.assigns.current_user do
+      nil ->
+        {:noreply, put_flash(socket, :error, "You must be logged in to add items to the cart.")}
+
+      %{} = current_user ->
+        user_id = current_user.id
+
+        # Add item to cart and update total_items after successful addition
+        case Cart.add_item_to_cart(user_id, id) do
+          {:ok, message} ->
+            IO.inspect(message, label: "Item added to cart successfully")
+            total_items = Cart.count_cart_items(user_id)
+            {:noreply, assign(socket, :total_items, total_items)}
+
+          {:error, message} ->
+            IO.inspect(message, label: "Error adding item to cart")
+            {:noreply, put_flash(socket, :error, "#{message}")}
+        end
+    end
   end
 
   def render(assigns) do
@@ -28,31 +70,16 @@ defmodule EcommerceWeb.ShopLive.ProductDetailsLive do
         <p class="text-gray-600 mb-6 leading-relaxed">
           <%= @product.description %>
         </p>
-        <!-- Quantity Control and Add to Cart -->
+
         <div class="flex items-center mb-6 space-x-4">
           <button
-            phx-click=""
+            phx-click="add-to-cart"
             phx-value-id={@product.id}
             class="bg-[#fe735e] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#fe6a4f] transition-colors duration-200"
           >
             Add to Cart
           </button>
-        </div>
-        <div class="mt-6 space-y-4">
-          <!-- Secure Payments -->
-          <div class="flex items-center space-x-2">
-            <p class="font-semibold text-gray-600">
-              Secure payments with Mpesa, credit, or debit card
-            </p>
-          </div>
-          <!-- Fast Delivery -->
-          <div class="flex items-center space-x-2">
-            <p class="font-semibold text-gray-600">Fast and free delivery within Nairobi</p>
-          </div>
-          <!-- Best Quality -->
-          <div class="flex items-center space-x-2">
-            <p class="font-semibold text-gray-600">Best quality you can ever ask for</p>
-          </div>
+          <span>Items in cart: <%= @total_items %></span>
         </div>
       </div>
     </div>
