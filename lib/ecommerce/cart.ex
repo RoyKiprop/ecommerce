@@ -10,9 +10,7 @@ defmodule Ecommerce.Cart do
         create_cart(user_id)
 
       order ->
-        # Preload both order_items and their associated products
-        order_with_items = Repo.preload(order, order_items: :product)
-        order_with_items
+        _order_with_items = Repo.preload(order, order_items: :product)
     end
   end
 
@@ -67,5 +65,50 @@ defmodule Ecommerce.Cart do
       :count,
       :id
     )
+  end
+
+  def delete_cart_item(product_id, user_id) do
+    cart = get_cart(user_id)
+
+    case Repo.get_by(Order_Item, order_id: cart.id, product_id: product_id) do
+      nil ->
+        {:error, "Item not found in the cart"}
+
+      order_item ->
+        case Repo.delete(order_item) do
+          {:ok, _} ->
+            {:ok, "Item deleted successfully"}
+
+          {:error, reason} ->
+            {:error, "Failed to delete item: #{reason}"}
+        end
+    end
+  end
+
+  def change_quantity(product_id, user_id, quantity) do
+    cart = get_cart(user_id)
+
+    case Repo.get_by(Order_Item, order_id: cart.id, product_id: product_id) do
+      nil ->
+        {:error, "Item not found in the cart"}
+
+      order_item ->
+        product = Repo.get!(Product, product_id)
+        new_price = Decimal.mult(product.price, Decimal.new(quantity))
+
+        changeset =
+          Order_Item.changeset(order_item, %{
+            quantity: quantity,
+            price: new_price
+          })
+
+        case Repo.update(changeset) do
+          {:ok, _} ->
+            {:ok, "Item updated successfully"}
+
+          {:error, reason} ->
+            {:error, "Failed to update quantity and price: #{reason}"}
+        end
+    end
   end
 end

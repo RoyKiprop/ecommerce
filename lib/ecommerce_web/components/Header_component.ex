@@ -42,7 +42,7 @@ defmodule EcommerceWeb.HeaderComponent do
       <div
         id="dropdown-menu"
         phx-click-away={JSHelpers.toggle_dropdown()}
-        class="absolute right-0 mt-2 p-4 w-[150px] bg-white rounded-lg shadow-xl text-sm border border-white"
+        class="absolute right-0 mt-2 p-4 w-[150px] bg-white rounded-lg shadow-xl text-sm border border-white z-50"
         hidden
       >
         <%= if @current_user do %>
@@ -87,13 +87,16 @@ defmodule EcommerceWeb.HeaderComponent do
 
   def cart(assigns) do
     ~H"""
-    <div class="relative inline-block">
-      <img src="/images/image.png" class="h-8 w-8" />
-
-      <div class="absolute top-0 right-[-16px] -mt-5 bg-blue-500 text-white rounded-full h-6 w-6 flex items-center justify-center text-xs">
-        3
+    <.link patch="/cart">
+      <div class="relative inline-block">
+        <!-- Cart Icon with Cart Count -->
+        <img src="/images/image.png" class="h-8 w-8 cursor-pointer" />
+        <!-- Cart count badge -->
+        <div class="absolute top-0 right-[-18px] -mt-5 bg-blue-500 text-white rounded-full h-6 w-6 flex items-center justify-center text-xs">
+          <%= @cart_count %>
+        </div>
       </div>
-    </div>
+    </.link>
     """
   end
 
