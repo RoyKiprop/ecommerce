@@ -58,6 +58,15 @@ defmodule EcommerceWeb do
     end
   end
 
+  def admin_live_view do
+    quote do
+      use Phoenix.LiveView,
+        layout: {EcommerceWeb.Layouts, "admin.html"}
+
+      unquote(html_helpers())
+    end
+  end
+
   def live_component do
     quote do
       use Phoenix.LiveComponent

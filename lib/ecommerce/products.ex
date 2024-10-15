@@ -197,4 +197,100 @@ defmodule Ecommerce.Products do
   def change_category(%Category{} = category, attrs \\ %{}) do
     Category.changeset(category, attrs)
   end
+
+  alias Ecommerce.Products.ExclusiveDeal
+
+  @doc """
+  Returns the list of exclusive_deals.
+
+  ## Examples
+
+      iex> list_exclusive_deals()
+      [%ExclusiveDeal{}, ...]
+
+  """
+  def list_exclusive_deals do
+    Repo.all(ExclusiveDeal)
+  end
+
+  @doc """
+  Gets a single exclusive_deal.
+
+  Raises `Ecto.NoResultsError` if the Exclusive deal does not exist.
+
+  ## Examples
+
+      iex> get_exclusive_deal!(123)
+      %ExclusiveDeal{}
+
+      iex> get_exclusive_deal!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_exclusive_deal!(id), do: Repo.get!(ExclusiveDeal, id)
+
+  @doc """
+  Creates a exclusive_deal.
+
+  ## Examples
+
+      iex> create_exclusive_deal(%{field: value})
+      {:ok, %ExclusiveDeal{}}
+
+      iex> create_exclusive_deal(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_exclusive_deal(attrs \\ %{}) do
+    %ExclusiveDeal{}
+    |> ExclusiveDeal.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a exclusive_deal.
+
+  ## Examples
+
+      iex> update_exclusive_deal(exclusive_deal, %{field: new_value})
+      {:ok, %ExclusiveDeal{}}
+
+      iex> update_exclusive_deal(exclusive_deal, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_exclusive_deal(%ExclusiveDeal{} = exclusive_deal, attrs) do
+    exclusive_deal
+    |> ExclusiveDeal.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a exclusive_deal.
+
+  ## Examples
+
+      iex> delete_exclusive_deal(exclusive_deal)
+      {:ok, %ExclusiveDeal{}}
+
+      iex> delete_exclusive_deal(exclusive_deal)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_exclusive_deal(%ExclusiveDeal{} = exclusive_deal) do
+    Repo.delete(exclusive_deal)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking exclusive_deal changes.
+
+  ## Examples
+
+      iex> change_exclusive_deal(exclusive_deal)
+      %Ecto.Changeset{data: %ExclusiveDeal{}}
+
+  """
+  def change_exclusive_deal(%ExclusiveDeal{} = exclusive_deal, attrs \\ %{}) do
+    ExclusiveDeal.changeset(exclusive_deal, attrs)
+  end
 end

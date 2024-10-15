@@ -8,13 +8,15 @@
     <%= for {slide, index} <- Enum.with_index(@slides) do %>
       <div class="w-full flex-shrink-0 flex flex-col md:flex-row items-center justify-between p-8 bg-black text-white transition-opacity duration-500">
         <!-- Text Section with slide-down animation -->
-        <div class={"w-full md:w-1/2 space-y-4 transition-all duration-700 " <>
+        <div class={"w-full md:w-1/2 space-y-6 transition-all duration-700 " <>
           if @current_slide == index, do: "animate-slide-down", else: ""}>
-          <h2 class="text-4xl font-bold"><%= slide.title %></h2>
-          <p class="text-xl text-gray-400"><%= slide.description %></p>
+          <h2 class="text-4xl font-bold w-[95%]"><%= slide.title %></h2>
+          <p class="text-xl text-gray-400 w-[90%]"><%= slide.description %></p>
+          <p class="text-xl text-gray-400"><%= slide.product.name %></p>
           <div class="flex space-x-4">
-            <button class="bg-white text-black px-4 py-2 rounded-md">View Product</button>
-            <button class="bg-blue-600 text-white px-4 py-2 rounded-md">Shop Products Now</button>
+            <.link href={~p"/shop"}>
+              <button class="bg-blue-500 text-white px-4 py-2 rounded-md">View Product</button>
+            </.link>
           </div>
         </div>
         <!-- Image Section with slide-up animation -->
@@ -22,7 +24,7 @@
           if @current_slide == index, do: "animate-slide-up", else: ""}>
           <img
             class="object-contain w-full h-48 md:h-auto"
-            src={slide.image_url}
+            src={slide.product.image}
             alt="Slide Image"
           />
         </div>

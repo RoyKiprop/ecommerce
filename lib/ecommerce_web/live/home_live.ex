@@ -1,38 +1,27 @@
 defmodule EcommerceWeb.HomeLive do
+  alias Ecommerce.Repo
+  alias Ecommerce.Products
   use EcommerceWeb, :live_view
+  alias Ecommerce.Products.{ExclusiveDeal, Product}
 
   # Auto-slide every 5 seconds
   @interval 5000
 
   def mount(_params, _session, socket) do
-    slides = [
-      %{
-        title: "ElectronicZ: Innovation Meets Excellence!",
-        description: "Joystick",
-        image_url: "/images/joystick.png"
-      },
-      %{
-        title: "ElectronicZ: Innovation Meets Excellence!",
-        description: "Laptop",
-        image_url: "/images/laptop.png"
-      },
-      %{
-        title: "ElectronicZ: Innovation Meets Excellence!",
-        description: "Phone",
-        image_url: "/images/phone.png"
-      },
-      %{
-        title: "ElectronicZ: Innovation Meets Excellence!",
-        description: "Headphones",
-        image_url: "/images/headphones.png"
-      }
-    ]
+    exclusive_deals =
+      Products.list_exclusive_deals()
+      |> Repo.preload(:product)
 
     # Start the auto-slide timer if connected
     if connected?(socket), do: :timer.send_interval(@interval, self(), :auto_slide)
 
     {:ok,
-     assign(socket, slides: slides, current_slide: 0, slide_active: 0, auto_slide_active: true)}
+     assign(socket,
+       slides: exclusive_deals,
+       current_slide: 0,
+       slide_active: 0,
+       auto_slide_active: true
+     )}
   end
 
   def handle_info(:auto_slide, socket) do

@@ -1,0 +1,36 @@
+<.header>
+  Exclusive deal <%= @exclusive_deal.id %>
+  <:subtitle>This is a exclusive_deal record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/exclusive_deals/#{@exclusive_deal}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit exclusive_deal</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Title"><%= @exclusive_deal.title %></:item>
+  <:item title="Description"><%= @exclusive_deal.description %></:item>
+  <:item title="Start date"><%= @exclusive_deal.start_date %></:item>
+  <:item title="End date"><%= @exclusive_deal.end_date %></:item>
+  <:item title="Discount"><%= @exclusive_deal.discount %></:item>
+  <:item title="Active"><%= @exclusive_deal.active %></:item>
+</.list>
+
+<.back navigate={~p"/exclusive_deals"}>Back to exclusive_deals</.back>
+
+<.modal
+  :if={@live_action == :edit}
+  id="exclusive_deal-modal"
+  show
+  on_cancel={JS.patch(~p"/exclusive_deals/#{@exclusive_deal}")}
+>
+  <.live_component
+    module={EcommerceWeb.ExclusiveDealLive.FormComponent}
+    id={@exclusive_deal.id}
+    title={@page_title}
+    action={@live_action}
+    exclusive_deal={@exclusive_deal}
+    patch={~p"/exclusive_deals/#{@exclusive_deal}"}
+  />
+</.modal>

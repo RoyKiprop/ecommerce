@@ -207,28 +207,6 @@ defmodule EcommerceWeb.HeaderComponent do
             About Us
           </.link>
         </li>
-
-        <li>
-          <.link
-            href="/"
-            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
-            role="navigation"
-            method="get"
-          >
-            Blog
-          </.link>
-        </li>
-
-        <li>
-          <.link
-            href="/"
-            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
-            role="navigation"
-            method="get"
-          >
-            Contact Us
-          </.link>
-        </li>
       </ul>
     </div>
     """
@@ -237,7 +215,7 @@ defmodule EcommerceWeb.HeaderComponent do
   def flash_sale(assigns) do
     ~H"""
     <div class="flex items-center">
-      <span>Exclusive Sales</span>
+      <span>Exclusive Deals</span>
       <img class="h-10 w-10" src="/images/sales.png" />
     </div>
     """

@@ -65,6 +65,9 @@ defmodule EcommerceWeb.Router do
     live_session :require_authenticated_user,
       on_mount: [{EcommerceWeb.UserAuth, :ensure_authenticated}] do
       live "/cart", CartLive, :index
+      live "/exclusive_deals", ExclusiveDealLive.Index, :index
+      live "/exclusive_deals/new", ExclusiveDealLive.Index, :new
+      live "/exclusive_deals/edit", ExclusiveDealLive, :edit
       live "/products", ProductLive.Index, :index
       live "/products/new", ProductLive.Index, :new
       live "/categories", CategoryLive.Index, :index

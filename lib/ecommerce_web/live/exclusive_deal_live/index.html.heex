@@ -1,0 +1,51 @@
+<.header>
+  Listing Exclusive deals
+  <:actions>
+    <.link patch={~p"/exclusive_deals/new"}>
+      <.button>New Exclusive deal</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="exclusive_deals"
+  rows={@streams.exclusive_deals}
+  row_click={fn {_id, exclusive_deal} -> JS.navigate(~p"/exclusive_deals/#{exclusive_deal}") end}
+>
+  <:col :let={{_id, exclusive_deal}} label="Title"><%= exclusive_deal.title %></:col>
+  <:col :let={{_id, exclusive_deal}} label="Description"><%= exclusive_deal.description %></:col>
+  <:col :let={{_id, exclusive_deal}} label="Start date"><%= exclusive_deal.start_date %></:col>
+  <:col :let={{_id, exclusive_deal}} label="End date"><%= exclusive_deal.end_date %></:col>
+  <:col :let={{_id, exclusive_deal}} label="Discount"><%= exclusive_deal.discount %></:col>
+  <:col :let={{_id, exclusive_deal}} label="Active"><%= exclusive_deal.active %></:col>
+  <:action :let={{_id, exclusive_deal}}>
+    <div class="sr-only">
+      <.link navigate={~p"/exclusive_deals/#{exclusive_deal}"}>Show</.link>
+    </div>
+    <.link patch={~p"/exclusive_deals/#{exclusive_deal}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, exclusive_deal}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: exclusive_deal.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="exclusive_deal-modal"
+  show
+  on_cancel={JS.patch(~p"/exclusive_deals")}
+>
+  <.live_component
+    module={EcommerceWeb.ExclusiveDealLive.FormComponent}
+    id={@exclusive_deal.id || :new}
+    title={@page_title}
+    action={@live_action}
+    exclusive_deal={@exclusive_deal}
+    patch={~p"/exclusive_deals"}
+  />
+</.modal>

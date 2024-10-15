@@ -14,6 +14,7 @@ defmodule Ecommerce.Products.Product do
 
     belongs_to :category, Ecommerce.Products.Category
     has_many :order_items, Ecommerce.Order_Items.Order_Item
+    has_many :exclusive_deals, Ecommerce.Products.ExclusiveDeal
 
     timestamps(type: :utc_datetime)
   end

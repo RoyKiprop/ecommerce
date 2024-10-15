@@ -37,4 +37,23 @@ defmodule Ecommerce.ProductsFixtures do
 
     category
   end
+
+  @doc """
+  Generate a exclusive_deal.
+  """
+  def exclusive_deal_fixture(attrs \\ %{}) do
+    {:ok, exclusive_deal} =
+      attrs
+      |> Enum.into(%{
+        active: true,
+        description: "some description",
+        discount: "120.5",
+        end_date: ~N[2024-10-14 02:37:00],
+        name: "some name",
+        start_date: ~N[2024-10-14 02:37:00]
+      })
+      |> Ecommerce.Products.create_exclusive_deal()
+
+    exclusive_deal
+  end
 end
