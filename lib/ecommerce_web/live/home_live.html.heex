@@ -1,0 +1,43 @@
+<div class="mx-32 mt-6 relative h-[70vh] rounded-xl overflow-hidden">
+  <div
+    id="slider"
+    class="flex transition-transform duration-700 h-full"
+    style={"transform: translateX(-#{@current_slide * 100}%);"}
+    phx-hook="SlideTransition"
+  >
+    <%= for {slide, index} <- Enum.with_index(@slides) do %>
+      <div class="w-full flex-shrink-0 flex flex-col md:flex-row items-center justify-between p-8 bg-black text-white transition-opacity duration-500">
+        <!-- Text Section with slide-down animation -->
+        <div class={"w-full md:w-1/2 space-y-4 transition-all duration-700 " <>
+          if @current_slide == index, do: "animate-slide-down", else: ""}>
+          <h2 class="text-4xl font-bold"><%= slide.title %></h2>
+          <p class="text-xl text-gray-400"><%= slide.description %></p>
+          <div class="flex space-x-4">
+            <button class="bg-white text-black px-4 py-2 rounded-md">View Product</button>
+            <button class="bg-blue-600 text-white px-4 py-2 rounded-md">Shop Products Now</button>
+          </div>
+        </div>
+        <!-- Image Section with slide-up animation -->
+        <div class={"w-full md:w-1/2 transition-all duration-700 " <>
+          if @current_slide == index, do: "animate-slide-up", else: ""}>
+          <img
+            class="object-contain w-full h-48 md:h-auto"
+            src={slide.image_url}
+            alt="Slide Image"
+          />
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <!-- Slider Navigation Controls (dots) -->
+  <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+    <%= for {_, index} <- Enum.with_index(@slides) do %>
+      <div
+        phx-click="goto_slide"
+        phx-value-index={index}
+        class={"cursor-pointer h-2 w-6 rounded-full " <> if @current_slide == index, do: "bg-blue-600", else: "bg-gray-400"}
+      >
+      </div>
+    <% end %>
+  </div>
+</div>

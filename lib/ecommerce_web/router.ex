@@ -83,6 +83,7 @@ defmodule EcommerceWeb.Router do
       on_mount: [{EcommerceWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+      live "/home", HomeLive
       live "/shop", ProductLive, :index
       live "/shop/:id", ShopLive.ProductDetailsLive, :show
     end
