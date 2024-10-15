@@ -1,5 +1,5 @@
 defmodule EcommerceWeb.CategoryLive.Show do
-  use EcommerceWeb, :live_view
+  use EcommerceWeb, :admin_live_view
 
   alias Ecommerce.Products
 

@@ -27,13 +27,7 @@ defmodule EcommerceWeb.Router do
   #   pipe_through :api
   # end
 
-  # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:ecommerce, :dev_routes) do
-    # If you want to use the LiveDashboard in production, you should put
-    # it behind authentication and allow only admins to access it.
-    # If your application does not have an admins-only section yet,
-    # you can use Plug.BasicAuth to set up some basic authentication
-    # as long as you are also using SSL (which you should anyway).
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
@@ -59,19 +53,29 @@ defmodule EcommerceWeb.Router do
     post "/users/log_in", UserSessionController, :create
   end
 
-  scope "/", EcommerceWeb do
-    pipe_through [:browser, :require_authenticated_user]
+  # Define the session for authenticated users once
+  live_session :require_authenticated_user,
+    on_mount: [{EcommerceWeb.UserAuth, :ensure_authenticated}] do
+    # This session will be used for all authenticated routes
+    scope "/", EcommerceWeb do
+      pipe_through [:browser, :require_authenticated_user]
 
-    live_session :require_authenticated_user,
-      on_mount: [{EcommerceWeb.UserAuth, :ensure_authenticated}] do
-      live "/cart", CartLive, :index
-      live "/exclusive_deals", ExclusiveDealLive.Index, :index
-      live "/exclusive_deals/new", ExclusiveDealLive.Index, :new
-      live "/exclusive_deals/edit", ExclusiveDealLive, :edit
+      live "/dashboard", DashboardLive.Index, :index
       live "/products", ProductLive.Index, :index
       live "/products/new", ProductLive.Index, :new
+      live "/products/:id/edit", ProductLive.Index, :new
       live "/categories", CategoryLive.Index, :index
       live "/categories/new", CategoryLive.Index, :new
+      live "/exclusive_deals", ExclusiveDealLive.Index, :index
+      live "/exclusive_deals/new", ExclusiveDealLive.Index, :new
+      live "/exclusive_deals/:id/edit", ExclusiveDealLive, :edit
+    end
+
+    # Add other routes that require the same session here
+    scope "/", EcommerceWeb do
+      pipe_through [:browser, :require_authenticated_user]
+
+      live "/cart", CartLive, :index
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end

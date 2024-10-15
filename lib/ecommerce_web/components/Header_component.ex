@@ -207,6 +207,17 @@ defmodule EcommerceWeb.HeaderComponent do
             About Us
           </.link>
         </li>
+
+        <li>
+          <.link
+            href="/"
+            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            role="navigation"
+            method="get"
+          >
+            Contact Us
+          </.link>
+        </li>
       </ul>
     </div>
     """

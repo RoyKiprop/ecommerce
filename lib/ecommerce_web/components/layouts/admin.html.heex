@@ -1,0 +1,103 @@
+<main>
+  <!-- lib/ecommerce_web/templates/layout/admin.html.heex -->
+  <div class="flex h-screen">
+    <!-- Sidebar for Admin Navigation -->
+    <aside class="w-72 bg-black text-white flex flex-col">
+      <div class="flex items-center justify-center h-16 bg-black">
+        <h1 class="text-xl text-center font-bold">ADMIN</h1>
+      </div>
+
+      <nav class="flex-grow p-4">
+        <ul>
+          <li class="mb-4">
+            <.link navigate={~p"/dashboard"} class="block py-2 px-4 rounded hover:bg-gray-700">
+              DASHBOARD
+            </.link>
+          </li>
+          <li class="mb-4">
+            <.link navigate={~p"/products"} class="block py-2 px-4 rounded hover:bg-gray-700">
+              PRODUCTS
+            </.link>
+          </li>
+          <li class="mb-4">
+            <.link navigate={~p"/categories"} class="block py-2 px-4 rounded hover:bg-gray-700">
+              CATEGORIES
+            </.link>
+          </li>
+          <li class="mb-4">
+            <.link
+              navigate={~p"/exclusive_deals"}
+              class="block py-2 px-4 rounded hover:bg-gray-700"
+            >
+              HOT DEALS
+            </.link>
+          </li>
+          <li class="mb-4">
+            <.link navigate={} class="block py-2 px-4 rounded hover:bg-gray-700">
+              ORDERS
+            </.link>
+          </li>
+          <li>
+            <.link navigate={} class="block py-2 px-4 rounded hover:bg-gray-700">
+              USERS
+            </.link>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+    <!-- Main Content Area -->
+    <div class="flex-grow p-2 px-6">
+      <div class="flex justify-evenly items-center mb-8">
+        <div>
+          <ul class="flex items-center gap-10">
+            <li>
+              <.link
+                navigate={~p"/home"}
+                class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+                role="navigation"
+                method="get"
+              >
+                HOME
+              </.link>
+            </li>
+
+            <li>
+              <.link
+                navigate="/shop"
+                class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+                role="navigation"
+                method="get"
+              >
+                SHOP
+              </.link>
+            </li>
+
+            <li>
+              <.link
+                href="/"
+                class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+                role="navigation"
+                method="get"
+              >
+                ABOUT US
+              </.link>
+            </li>
+            <li>
+              <.link
+                navigate={~p"/dashboard"}
+                class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+              >
+                DASHBOARD
+              </.link>
+            </li>
+          </ul>
+        </div>
+        <.link class="flex items-center space-x-2 py-2 px-4 rounded bg-black text-white ">
+          <i class="bi bi-person-fill"></i> LOGIN
+        </.link>
+      </div>
+      <.flash_group flash={@flash} />
+      <%= @inner_content %>
+    </div>
+  </div>
+</main>

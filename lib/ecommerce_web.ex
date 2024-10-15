@@ -61,7 +61,7 @@ defmodule EcommerceWeb do
   def admin_live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {EcommerceWeb.Layouts, "admin.html"}
+        layout: {EcommerceWeb.Layouts, :admin}
 
       unquote(html_helpers())
     end

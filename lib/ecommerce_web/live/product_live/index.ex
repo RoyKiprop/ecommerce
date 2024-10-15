@@ -1,5 +1,5 @@
 defmodule EcommerceWeb.ProductLive.Index do
-  use EcommerceWeb, :live_view
+  use EcommerceWeb, :admin_live_view
 
   alias Ecommerce.Products
   alias Ecommerce.Products.Product

@@ -1,5 +1,5 @@
 defmodule EcommerceWeb.ExclusiveDealLive.Index do
-  use EcommerceWeb, :live_view
+  use EcommerceWeb, :admin_live_view
 
   alias Ecommerce.Products
   alias Ecommerce.Products.ExclusiveDeal
@@ -33,7 +33,10 @@ defmodule EcommerceWeb.ExclusiveDealLive.Index do
   end
 
   @impl true
-  def handle_info({EcommerceWeb.ExclusiveDealLive.FormComponent, {:saved, exclusive_deal}}, socket) do
+  def handle_info(
+        {EcommerceWeb.ExclusiveDealLive.FormComponent, {:saved, exclusive_deal}},
+        socket
+      ) do
     {:noreply, stream_insert(socket, :exclusive_deals, exclusive_deal)}
   end
 
