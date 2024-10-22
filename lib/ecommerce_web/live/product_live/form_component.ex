@@ -29,6 +29,8 @@ defmodule EcommerceWeb.ProductLive.FormComponent do
 
         <.input field={@form[:description]} type="text" label="Description" />
         <.input field={@form[:price]} type="number" label="Price" step="any" />
+        <.input field={@form[:discount]} type="number" label="Discount" step="any" />
+
         <.input field={@form[:currency]} type="text" label="Currency" />
         <.input field={@form[:color]} type="text" label="Color" />
         <.input field={@form[:image]} type="text" label="Image" />

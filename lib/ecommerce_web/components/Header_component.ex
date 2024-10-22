@@ -105,13 +105,13 @@ defmodule EcommerceWeb.HeaderComponent do
     <div class="relative">
       <button
         phx-click={JSHelpers.toggle_category()}
-        class="text-black hover:text-[#0e64b8] text-sm font-medium focus:text-[#0e64b8]"
+        class="text-black hover:text-blue-800 text-sm font-medium focus:text-blue-800"
       >
         <i class="fa fa-bars" aria-hidden="true"></i> CATEGORIES
       </button>
       <div
         id="category-dropdown"
-        class="absolute hidden left-[-24px] mt-1 w-[200px] space-y-12 text-lg bg-gray-400 p-5 rounded-lg"
+        class="absolute hidden left-[-24px] mt-1 w-[200px] space-y-12 text-lg bg-black z-50 p-5 rounded-lg"
         phx-click-away={JSHelpers.toggle_category()}
       >
         <div class="flex flex-col space-y-4 text-sm">
@@ -178,7 +178,7 @@ defmodule EcommerceWeb.HeaderComponent do
         <li>
           <.link
             navigate="/"
-            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            class="text-black hover:text-blue-800 focus:text-blue-800"
             role="navigation"
             method="get"
           >
@@ -189,7 +189,7 @@ defmodule EcommerceWeb.HeaderComponent do
         <li>
           <.link
             navigate="/shop"
-            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            class="text-black hover:text-blue-800 focus:text-blue-800"
             role="navigation"
             method="get"
           >
@@ -200,7 +200,7 @@ defmodule EcommerceWeb.HeaderComponent do
         <li>
           <.link
             href="/"
-            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            class="text-black hover:text-blue-800 focus:text-blue-800"
             role="navigation"
             method="get"
           >
@@ -211,7 +211,7 @@ defmodule EcommerceWeb.HeaderComponent do
         <li>
           <.link
             href="/"
-            class="text-black hover:text-[#0e64b8] focus:text-[#0e64b8]"
+            class="text-black hover:text-blue-800 focus:text-blue-800"
             role="navigation"
             method="get"
           >
@@ -225,10 +225,7 @@ defmodule EcommerceWeb.HeaderComponent do
 
   def flash_sale(assigns) do
     ~H"""
-    <div class="flex items-center">
-      <span>Exclusive Deals</span>
-      <img class="h-10 w-10" src="/images/sales.png" />
-    </div>
+    <div class="flex items-center"></div>
     """
   end
 end

@@ -1,12 +1,12 @@
-<header class="bg-gray-100">
-  <div class="px-32 py-10 flex justify-between items-center ">
+<header>
+  <div class="px-32 pt-8 pb-5 flex justify-between  items-center ">
     <.logo />
     <.filter />
     <div class="flex justify-end  space-x-5 w-[10%] ">
       <.user current_user={@current_user} />
     </div>
   </div>
-  <div class="px-32 flex justify-between items-center">
+  <div class="px-32 py-4 flex justify-between border-b border-t items-center">
     <.category />
     <.navigation />
     <.flash_sale />
@@ -16,3 +16,44 @@
   <.flash_group flash={@flash} />
   <%= @inner_content %>
 </body>
+
+<footer class="bg-black text-gray-300 py-16 mt-20">
+  <div class="container mx-32  flex justify-between border-b pb-8">
+    <!-- About Us Section -->
+    <div class="w-3/4">
+      <h2 class="text-lg font-semibold mb-4 text-white">Iphones Solutions</h2>
+      <p class="text-sm leading-relaxed w-[50%]">
+        Welcome to <span class="text-blue-600 text-base">Iphones Solutions</span>, where we provide top-quality products and exceptional customer service. Your satisfaction is our priority, and we aim to deliver an unforgettable shopping experience.
+      </p>
+    </div>
+    <!-- Contact Information -->
+    <div class="w-1/4">
+      <h2 class="text-lg font-semibold mb-4 text-white">Get in Touch With Us</h2>
+      <ul class="space-y-2">
+        <li class="flex items-center">
+          <i class="fas fa-phone-alt mr-2"></i>
+          <span>+254711470560</span>
+        </li>
+        <li class="flex items-center">
+          <i class="fab fa-whatsapp mr-2"></i>
+          <span>+254711470560</span>
+        </li>
+        <li class="flex items-center">
+          <i class="fas fa-map-marker-alt mr-2"></i>
+          <span>Nairobi</span>
+        </li>
+        <li class="flex items-center">
+          <i class="fas fa-envelope mr-2"></i>
+          <span>iphones@gmail.com</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- Copyright Section -->
+  <div class="text-center space-y-3 mt-6">
+    <p class="text-sm">Built by Roy Kiprop</p>
+    <p class="text-sm">
+      &copy; <%= DateTime.utc_now().year %> All rights reserved.
+    </p>
+  </div>
+</footer>

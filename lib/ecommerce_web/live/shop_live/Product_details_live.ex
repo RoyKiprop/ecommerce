@@ -5,39 +5,31 @@ defmodule EcommerceWeb.ShopLive.ProductDetailsLive do
   alias Ecommerce.Accounts
 
   def mount(%{"id" => id}, session, socket) do
-    # Fetch the product using the provided ID
     product = Products.get_product!(id)
 
-    # Determine the current user based on the session token
     current_user =
       case session["user_token"] do
         nil -> nil
         token -> Accounts.get_user_by_session_token(token)
       end
 
-    {cart_items, cart_count} =
+    {cart_count, in_cart} =
       if current_user do
-        case Cart.get_cart(current_user.id) do
-          %Ecommerce.Orders.Order{order_items: items} when is_list(items) ->
-            {items, length(items)}
-
-          nil ->
-            {[], 0}
-
-          _ ->
-            {[], 0}
-        end
+        {
+          Cart.count_cart_items(current_user.id),
+          Cart.item_in_cart?(current_user.id, id)
+        }
       else
-        {[], 0}
+        {0, false}
       end
 
     {:ok,
      assign(socket,
        product: product,
-       cart_items: cart_items,
+       current_user: current_user,
        cart_count: cart_count,
-       promo_code: "",
-       modal_open: false
+       in_cart: in_cart,
+       promo_code: ""
      )}
   end
 
@@ -51,23 +43,48 @@ defmodule EcommerceWeb.ShopLive.ProductDetailsLive do
 
         case Cart.add_item_to_cart(user_id, id) do
           {:ok, message} ->
-            IO.inspect(message, label: "Item added to cart successfully")
-
-            # Fetch updated cart information
-            updated_cart = Cart.get_cart(user_id)
-            updated_cart_items = updated_cart.order_items
-            updated_cart_count = length(updated_cart_items)
+            updated_cart_count = Cart.count_cart_items(user_id)
+            in_cart = Cart.item_in_cart?(user_id, id)
 
             {:noreply,
              socket
-             |> assign(cart_items: updated_cart_items, cart_count: updated_cart_count)
-             |> put_flash(:info, "Item added to cart successfully")}
+             |> assign(
+               cart_count: updated_cart_count,
+               in_cart: in_cart
+             )
+             |> put_flash(:info, message)}
 
           {:error, message} ->
-            IO.inspect(message, label: "Error adding item to cart")
-            {:noreply, put_flash(socket, :error, "#{message}")}
+            {:noreply, put_flash(socket, :error, message)}
         end
     end
+  end
+
+  def handle_event("remove-from-cart", %{"id" => id}, socket) do
+    user_id = socket.assigns.current_user.id
+
+    case Cart.delete_cart_item(user_id, id) do
+      {:ok, message} ->
+        count = Cart.count_cart_items(user_id)
+
+        {:noreply,
+         socket
+         |> put_flash(:info, message)
+         |> assign(socket, cart_count: count)}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to delete item: #{reason}")}
+    end
+
+    {:ok, socket}
+  end
+
+  def handle_event("continue-shopping", _params, socket) do
+    {:noreply, push_navigate(socket, to: "/shop")}
+  end
+
+  def handle_event("proceed-to-cart", _params, socket) do
+    {:noreply, push_navigate(socket, to: "/cart")}
   end
 
   def render(assigns) do
@@ -81,7 +98,7 @@ defmodule EcommerceWeb.ShopLive.ProductDetailsLive do
         />
       </div>
 
-      <div class="w-full lg:w-1/2  p-8">
+      <div class="w-full lg:w-1/2 p-8">
         <div class="border-b">
           <h1 class="text-3xl font-semibold text-black mb-2"><%= @product.name %></h1>
           <div class="mb-2 text-yellow-500 text-left flex">
@@ -92,76 +109,84 @@ defmodule EcommerceWeb.ShopLive.ProductDetailsLive do
             <i class="bi bi-star-half"></i>
           </div>
 
-          <p class="font-semibold text-red-600 text-base text-left mb-2">
-            <%= @product.currency %> <%= @product.price %>
-          </p>
+          <div class="flex items-center space-x-8">
+            <p class="font-semibold text-red-600 text-base text-left thick-strike">
+              <%= @product.currency %> <%= @product.price %>
+            </p>
+            <p class="font-semibold text-green-600 text-lg text-left">
+              <%= @product.currency %> <%= @product.discounted_price %>
+            </p>
+          </div>
         </div>
 
-        <p class="text-black font-light text-md my-4 ">
+        <p class="text-black font-light text-md my-4">
           <%= @product.description %>
         </p>
-        <!-- Quantity input and Remove from Cart button -->
-        <div class="hidden flex space-x-5 mb-6">
-          <input
-            type="number"
-            min="1"
-            value="1"
-            phx-blur="update_quantity"
-            phx-value-id={@product.id}
-            class="w-1/3 text-center p-2 border border-gray-300 rounded-lg"
-          />
-          <button
-            phx-click="remove-from-cart"
-            phx-value-id={@product.id}
-            class="bg-red-600 text-white font-semibold py-2 px-6 flex items-center justify-center w-full hover:bg-red-700 transition-colors duration-200 rounded-lg"
-          >
-            <i class="bi bi-trash-fill mr-2"></i> Remove from Cart
-          </button>
-        </div>
-        <!-- Add to Cart button -->
-        <div class="flex items-center mb-6">
-          <button
-            phx-click="add-to-cart"
-            phx-value-id={@product.id}
-            class="bg-blue-700 text-white font-semibold py-2 px-6 flex items-center justify-center w-full hover:bg-black transition-colors duration-200 rounded-lg"
-          >
-            Add to Cart
-          </button>
-        </div>
-        <!-- Continue Shopping and Proceed to Cart buttons -->
-        <div class="hidden flex space-x-5">
-          <button
-            phx-click="continue-shopping"
-            phx-value-id={@product.id}
-            class="bg-green-600 text-white font-semibold py-2 px-6 flex items-center justify-center w-full hover:bg-green-700 transition-colors duration-200 rounded-lg"
-          >
-            <i class="bi bi-arrow-left-circle-fill mr-2"></i> Continue Shopping
-          </button>
-          <button
-            phx-click="proceed-to-cart"
-            phx-value-id={@product.id}
-            class="bg-blue-600 text-white font-semibold py-2 px-6 flex items-center justify-center w-full hover:bg-blue-700 transition-colors duration-200 rounded-lg"
-          >
-            <i class="bi bi-arrow-right-circle-fill mr-2"></i> Proceed to Cart
-          </button>
-        </div>
-        <!-- Additional Information Section -->
-        <div class="mt-6 space-y-4 text-sm">
-          <div class="flex items-center space-x-2">
-            <i class="bi bi-award text-yellow-500 text-xl"></i>
-            <span class="text-black font-light">High Quality Products</span>
+        <!-- Conditionally render buttons based on whether the product is in the cart -->
+        <%= if @in_cart do %>
+          <!-- Cart Buttons (Quantity input, Remove from Cart, Continue Shopping, Proceed to Cart) -->
+          <div id="cart-buttons-div" class="flex flex-col space-y-4">
+            <div class="flex space-x-5">
+              <div class="flex flex-col sm:flex-row items-center border border-gray-300 rounded-md w-max bg-gray-100">
+                <!-- Decrease Button -->
+                <button
+                  phx-click="decrease_quantity"
+                  phx-value-id=""
+                  class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-l-md sm:rounded-l-none sm:rounded-t-md focus:outline-none"
+                >
+                  -
+                </button>
+                <!-- Quantity Display -->
+                <span class="px-4 py-2 bg-white text-gray-700 text-sm font-semibold border-t sm:border-l sm:border-r sm:border-gray-300">
+                  {item.quantity}
+                </span>
+                <!-- Increase Button -->
+                <button
+                  phx-click="increase_quantity"
+                  phx-value-id=""
+                  class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-r-md sm:rounded-r-none sm:rounded-b-md focus:outline-none"
+                >
+                  +
+                </button>
+              </div>
+
+              <button
+                phx-click="remove-from-cart"
+                phx-value-id={@product.id}
+                class="bg-red-600 text-white font-semibold py-2 px-6 flex items-center justify-center w-full hover:bg-red-700 transition-colors duration-200 rounded-lg"
+              >
+                <i class="bi bi-trash-fill mr-2"></i> Remove from Cart
+              </button>
+            </div>
+
+            <div class="flex space-x-5">
+              <button
+                phx-click="continue-shopping"
+                class="bg-green-600 text-white font-semibold py-2 px-6 flex items-center justify-center w-full hover:bg-green-700 transition-colors duration-200 rounded-lg"
+              >
+                <i class="bi bi-arrow-left-circle-fill mr-2"></i> Continue Shopping
+              </button>
+              <button
+                phx-click="proceed-to-cart"
+                class="bg-blue-600 text-white font-semibold py-2 px-6 flex items-center justify-center w-full hover:bg-blue-700 transition-colors duration-200 rounded-lg"
+              >
+                <i class="bi bi-arrow-right-circle-fill mr-2"></i> Proceed to Cart
+              </button>
+            </div>
           </div>
-          <div class="flex items-center space-x-2">
-            <i class="bi bi-shield-lock-fill text-green-500 text-xl"></i>
-            <span class="text-black font-light">
-              Secure Payments with Mpesa, Credit and Debit Card
-            </span>
+        <% else %>
+          <!-- Add to Cart Button -->
+          <div id="add-to-cart-div" class="flex items-center mb-6">
+            <button
+              id="add-cart"
+              phx-click="add-to-cart"
+              phx-value-id={@product.id}
+              class="bg-blue-700 text-white font-semibold py-2 px-6 flex items-center justify-center w-full hover:bg-black transition-colors duration-200 rounded-lg"
+            >
+              Add to Cart
+            </button>
           </div>
-          <div class="flex items-center space-x-2">
-            <i class="bi bi-truck text-blue-600 text-xl"></i>
-            <span class="text-black font-light">Free delivery within Nairobi</span>
-          </div>
-        </div>
+        <% end %>
       </div>
     </div>
     """

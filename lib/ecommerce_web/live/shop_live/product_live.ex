@@ -7,29 +7,18 @@ defmodule EcommerceWeb.ProductLive do
     products = Products.list_products()
     current_user = socket.assigns[:current_user]
 
-    {cart_items, cart_count} =
+    cart_count =
       if current_user do
-        case Cart.get_cart(current_user.id) do
-          %Ecommerce.Orders.Order{order_items: items} when is_list(items) ->
-            {items, length(items)}
-
-          nil ->
-            {[], 0}
-
-          _ ->
-            {[], 0}
-        end
+        Cart.count_cart_items(current_user.id)
       else
-        {[], 0}
+        0
       end
 
     {:ok,
      assign(socket,
        products: products,
-       cart_items: cart_items,
        cart_count: cart_count,
-       promo_code: "",
-       modal_open: false
+       promo_code: ""
      )}
   end
 
@@ -71,10 +60,14 @@ defmodule EcommerceWeb.ProductLive do
                 <i class="bi bi-star-fill"></i>
                 <i class="bi bi-star-half"></i>
               </div>
-
-              <p class="font-semibold text-red-600 text-base text-left">
-                <%= product.currency %> <%= product.price %>
-              </p>
+              <div class="flex items-center justify-between">
+                <p class="font-semibold text-red-600 text-base text-left thick-strike">
+                  <%= product.currency %> <%= product.price %>
+                </p>
+                <p class="font-semibold text-green-600 text-lg text-left">
+                  <%= product.currency %> <%= product.discounted_price %>
+                </p>
+              </div>
             </div>
           </div>
         <% end %>

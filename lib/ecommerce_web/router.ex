@@ -63,7 +63,7 @@ defmodule EcommerceWeb.Router do
       live "/dashboard", DashboardLive.Index, :index
       live "/products", ProductLive.Index, :index
       live "/products/new", ProductLive.Index, :new
-      live "/products/:id/edit", ProductLive.Index, :new
+      live "/products/:id/edit", ProductLive.Index, :edit
       live "/categories", CategoryLive.Index, :index
       live "/categories/new", CategoryLive.Index, :new
       live "/exclusive_deals", ExclusiveDealLive.Index, :index

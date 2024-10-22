@@ -10,6 +10,7 @@ defmodule Ecommerce.Products.Product do
     field :color, :string
     field :price, :decimal
     field :discount, :decimal
+    field :discounted_price, :decimal
     field :stock, :integer
 
     belongs_to :category, Ecommerce.Products.Category
@@ -31,8 +32,31 @@ defmodule Ecommerce.Products.Product do
       :image,
       :stock,
       :category_id,
+      :discount,
+      :discounted_price
+    ])
+    |> validate_required([
+      :name,
+      :description,
+      :price,
+      :currency,
+      :color,
+      :image,
+      :stock,
       :discount
     ])
-    |> validate_required([:name, :description, :price, :currency, :color, :image, :stock])
+    |> calculate_discounted_price()
+  end
+
+  defp calculate_discounted_price(changeset) do
+    price = get_field(changeset, :price)
+    discount = get_field(changeset, :discount)
+
+    if price && discount do
+      discounted_price = Decimal.sub(price, discount)
+      put_change(changeset, :discounted_price, discounted_price)
+    else
+      changeset
+    end
   end
 end

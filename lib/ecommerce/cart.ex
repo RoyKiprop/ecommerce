@@ -1,16 +1,20 @@
 defmodule Ecommerce.Cart do
-  import Ecto.Query
   alias Ecommerce.Repo
   alias Ecommerce.{Orders.Order, Order_Items.Order_Item}
   alias Ecommerce.Products.Product
+  import Ecto.Query
+
+  @discount_threshold 100_000
+  @discount_value 5000
 
   def get_cart(user_id) do
-    case Repo.get_by(Order, user_id: user_id, status: "cart") do
-      nil ->
-        create_cart(user_id)
-
-      order ->
-        _order_with_items = Repo.preload(order, order_items: :product)
+    case Repo.one(
+           from o in Order,
+             where: o.user_id == ^user_id and o.status == "cart",
+             preload: [order_items: :product]
+         ) do
+      nil -> create_cart(user_id)
+      cart -> cart
     end
   end
 
@@ -18,6 +22,7 @@ defmodule Ecommerce.Cart do
     %Order{}
     |> Order.changeset(%{user_id: user_id, status: "cart"})
     |> Repo.insert!()
+    |> Repo.preload(:order_items)
   end
 
   def add_item_to_cart(user_id, product_id) do
@@ -28,43 +33,42 @@ defmodule Ecommerce.Cart do
         {:error, "Product not found"}
 
       product ->
-        case Repo.get_by(Order_Item, order_id: cart.id, product_id: product_id) do
+        case Enum.find(cart.order_items, &(&1.product_id == product.id)) do
           nil ->
-            changeset =
+            # Safely handle discounted_price
+            discounted_price = product.discounted_price || 0
+
+            order_item_changeset =
               %Order_Item{}
               |> Order_Item.changeset(%{
                 product_id: product.id,
                 quantity: 1,
                 price: product.price,
-                discount: product.discount,
+                discounted_price: discounted_price,
+                currency: product.currency,
                 order_id: cart.id
               })
 
-            case Repo.insert(changeset) do
+            case Repo.insert(order_item_changeset) do
               {:ok, _order_item} ->
-                {:ok, "Item created successfully"}
+                # Recalculate the cart subtotal and apply discount if applicable
+                cart_subtotal(user_id)
 
-              {:error, changeset} ->
-                IO.inspect(changeset.errors, label: "Failed to insert Order_Item")
+                {:ok, "Item added successfully"}
+
+              {:error, _changeset} ->
                 {:error, "Failed to add item to cart"}
             end
 
-          _order_item ->
+          _existing_item ->
             {:error, "Item already in cart"}
         end
     end
   end
 
   def count_cart_items(user_id) do
-    # Get the user's cart
     cart = get_cart(user_id)
-
-    # Query the number of items in the cart
-    Repo.aggregate(
-      from(oi in Order_Item, where: oi.order_id == ^cart.id),
-      :count,
-      :id
-    )
+    length(cart.order_items)
   end
 
   def delete_cart_item(product_id, user_id) do
@@ -95,11 +99,13 @@ defmodule Ecommerce.Cart do
       order_item ->
         product = Repo.get!(Product, product_id)
         new_price = Decimal.mult(product.price, Decimal.new(quantity))
+        new_discount = Decimal.mult(product.discounted_price, Decimal.new(quantity))
 
         changeset =
           Order_Item.changeset(order_item, %{
             quantity: quantity,
-            price: new_price
+            price: new_price,
+            discounted_price: new_discount
           })
 
         case Repo.update(changeset) do
@@ -110,5 +116,40 @@ defmodule Ecommerce.Cart do
             {:error, "Failed to update quantity and price: #{reason}"}
         end
     end
+  end
+
+  def item_in_cart?(user_id, product_id) do
+    cart = get_cart(user_id)
+    Enum.any?(cart.order_items, fn item -> item.product_id == String.to_integer(product_id) end)
+  end
+
+  def cart_subtotal(user_id) do
+    cart = get_cart(user_id)
+
+    # Initialize accumulator as a Decimal
+    sub_total =
+      Enum.reduce(cart.order_items, Decimal.new(0), fn item, acc ->
+        # Ensure we are adding two Decimal values
+        acc |> Decimal.add(item.discounted_price || Decimal.new(0))
+      end)
+
+    # Create the changeset
+    changeset = Order.changeset(cart, %{sub_total: sub_total})
+
+    # Update the order and handle the result
+    case Repo.update(changeset) do
+      {:ok, _order} ->
+        # Return the subtotal if needed
+        {:ok, sub_total}
+
+      {:error, changeset} ->
+        {:error, "Failed to update subtotal: #{inspect(changeset.errors)}"}
+    end
+  end
+
+  def get_cart_subtotal(user_id) do
+    cart = get_cart(user_id)
+
+    cart.sub_total
   end
 end

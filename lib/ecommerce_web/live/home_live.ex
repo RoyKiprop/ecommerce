@@ -1,8 +1,9 @@
 defmodule EcommerceWeb.HomeLive do
+  alias Ecommerce.Cart
   alias Ecommerce.Repo
   alias Ecommerce.Products
   use EcommerceWeb, :live_view
-  alias Ecommerce.Products.{ExclusiveDeal, Product}
+  alias Ecommerce.Products.ExclusiveDeal
 
   # Auto-slide every 5 seconds
   @interval 5000
@@ -12,7 +13,17 @@ defmodule EcommerceWeb.HomeLive do
       Products.list_exclusive_deals()
       |> Repo.preload(:product)
 
+    current_user = socket.assigns[:current_user]
+
+    cart_count =
+      if current_user do
+        Cart.count_cart_items(current_user.id)
+      else
+        0
+      end
+
     # Start the auto-slide timer if connected
+
     if connected?(socket), do: :timer.send_interval(@interval, self(), :auto_slide)
 
     {:ok,
@@ -20,7 +31,8 @@ defmodule EcommerceWeb.HomeLive do
        slides: exclusive_deals,
        current_slide: 0,
        slide_active: 0,
-       auto_slide_active: true
+       auto_slide_active: true,
+       cart_count: cart_count
      )}
   end
 

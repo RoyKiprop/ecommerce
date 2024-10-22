@@ -50,3 +50,9 @@
 .animate-slide-up {
   animation: slide-up 1s ease-in-out forwards;
 }
+
+.thick-strike {
+  text-decoration: line-through;
+  text-decoration-thickness: 3px;
+  text-decoration-color: red;
+}
