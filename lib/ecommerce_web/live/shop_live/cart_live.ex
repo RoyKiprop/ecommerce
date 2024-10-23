@@ -16,27 +16,57 @@ defmodule EcommerceWeb.CartLive do
      )}
   end
 
-  def handle_event("update_quantity", %{"id" => id, "value" => quantity}, socket) do
+  def handle_event("increase_quantity", %{"id" => id}, socket) do
     user_id = socket.assigns.current_user.id
-    quantity = String.to_integer(quantity)
+    id = String.to_integer(id)
+    item = Cart.get_item(user_id, id)
+    new_quantity = item.quantity + 1
 
-    case Cart.change_quantity(id, user_id, quantity) do
+    case Cart.change_quantity(id, user_id, new_quantity) do
       {:ok, message} ->
         updated_cart_items = Cart.get_cart(user_id).order_items
-        updated_cart_count = Cart.count_cart_items(user_id)
-
-        # Recalculate and get the updated cart subtotal
+        # Handle the returned tuple
+        {:ok, updated_cart_subtotal} = Cart.cart_subtotal(user_id)
 
         {:noreply,
          socket
          |> put_flash(:info, message)
          |> assign(
            cart_items: updated_cart_items,
-           cart_count: updated_cart_count
+           cart_subtotal: updated_cart_subtotal
          )}
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to update item: #{reason}")}
+        {:noreply, put_flash(socket, :error, "Failed to increase quantity: #{reason}")}
+    end
+  end
+
+  def handle_event("decrease_quantity", %{"id" => id}, socket) do
+    user_id = socket.assigns.current_user.id
+    id = String.to_integer(id)
+    item = Cart.get_item(user_id, id)
+    new_quantity = item.quantity - 1
+
+    if new_quantity > 0 do
+      case Cart.change_quantity(id, user_id, new_quantity) do
+        {:ok, message} ->
+          updated_cart_items = Cart.get_cart(user_id).order_items
+          # Handle the returned tuple
+          {:ok, updated_cart_subtotal} = Cart.cart_subtotal(user_id)
+
+          {:noreply,
+           socket
+           |> put_flash(:info, message)
+           |> assign(
+             cart_items: updated_cart_items,
+             cart_subtotal: updated_cart_subtotal
+           )}
+
+        {:error, reason} ->
+          {:noreply, put_flash(socket, :error, "Failed to increase quantity: #{reason}")}
+      end
+    else
+      {:noreply, socket}
     end
   end
 

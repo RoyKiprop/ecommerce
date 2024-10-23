@@ -89,7 +89,7 @@ defmodule Ecommerce.Cart do
     end
   end
 
-  def change_quantity(product_id, user_id, quantity) do
+  def change_quantity(product_id, user_id, new_quantity) do
     cart = get_cart(user_id)
 
     case Repo.get_by(Order_Item, order_id: cart.id, product_id: product_id) do
@@ -98,22 +98,30 @@ defmodule Ecommerce.Cart do
 
       order_item ->
         product = Repo.get!(Product, product_id)
-        new_price = Decimal.mult(product.price, Decimal.new(quantity))
-        new_discount = Decimal.mult(product.discounted_price, Decimal.new(quantity))
+
+        # Convert to Decimal before multiplication
+        new_price = Decimal.mult(Decimal.new(product.price), Decimal.new(new_quantity))
+
+        new_discount =
+          if product.discounted_price do
+            Decimal.mult(Decimal.new(product.discounted_price), Decimal.new(new_quantity))
+          else
+            nil
+          end
 
         changeset =
           Order_Item.changeset(order_item, %{
-            quantity: quantity,
+            quantity: new_quantity,
             price: new_price,
             discounted_price: new_discount
           })
 
         case Repo.update(changeset) do
-          {:ok, _} ->
+          {:ok, updated_item} ->
             {:ok, "Item updated successfully"}
 
-          {:error, reason} ->
-            {:error, "Failed to update quantity and price: #{reason}"}
+          {:error, changeset} ->
+            {:error, "Failed to update quantity: #{inspect(changeset.errors)}"}
         end
     end
   end
@@ -151,5 +159,10 @@ defmodule Ecommerce.Cart do
     cart = get_cart(user_id)
 
     cart.sub_total
+  end
+
+  def get_item(user_id, product_id) do
+    cart = get_cart(user_id)
+    Enum.find(cart.order_items, fn item -> item.product_id == product_id end)
   end
 end
