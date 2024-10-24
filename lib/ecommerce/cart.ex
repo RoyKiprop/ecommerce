@@ -45,7 +45,7 @@ defmodule Ecommerce.Cart do
                 quantity: 1,
                 price: product.price,
                 discounted_price: discounted_price,
-                currency: product.currency,
+                currecny: product.currency,
                 order_id: cart.id
               })
 
@@ -54,7 +54,7 @@ defmodule Ecommerce.Cart do
                 # Recalculate the cart subtotal and apply discount if applicable
                 cart_subtotal(user_id)
 
-                {:ok, "Item added successfully"}
+                {:ok, "Item added to cart successfully"}
 
               {:error, _changeset} ->
                 {:error, "Failed to add item to cart"}
@@ -117,7 +117,7 @@ defmodule Ecommerce.Cart do
           })
 
         case Repo.update(changeset) do
-          {:ok, updated_item} ->
+          {:ok, _updated_item} ->
             {:ok, "Item updated successfully"}
 
           {:error, changeset} ->
@@ -141,8 +141,18 @@ defmodule Ecommerce.Cart do
         acc |> Decimal.add(item.discounted_price || Decimal.new(0))
       end)
 
+    discount =
+      if Decimal.compare(sub_total, Decimal.new(@discount_threshold)) == :gt do
+        Decimal.new(@discount_value)
+      else
+        Decimal.new(0)
+      end
+
+    # Subtract the discount from the subtotal
+    total = Decimal.sub(sub_total, discount)
+
     # Create the changeset
-    changeset = Order.changeset(cart, %{sub_total: sub_total})
+    changeset = Order.changeset(cart, %{sub_total: sub_total, total: total, discount: discount})
 
     # Update the order and handle the result
     case Repo.update(changeset) do
@@ -164,5 +174,14 @@ defmodule Ecommerce.Cart do
   def get_item(user_id, product_id) do
     cart = get_cart(user_id)
     Enum.find(cart.order_items, fn item -> item.product_id == product_id end)
+  end
+
+  def get_quantity(user_id, product_id) do
+    cart = get_cart(user_id)
+
+    case Repo.get_by(Order_Item, order_id: cart.id, product_id: product_id) do
+      nil -> 0
+      order_item -> order_item.quantity
+    end
   end
 end

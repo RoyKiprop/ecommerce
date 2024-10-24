@@ -23,14 +23,24 @@ defmodule EcommerceWeb.CartLive do
     new_quantity = item.quantity + 1
 
     case Cart.change_quantity(id, user_id, new_quantity) do
-      {:ok, message} ->
-        updated_cart_items = Cart.get_cart(user_id).order_items
-        # Handle the returned tuple
+      {:ok, _message} ->
+        # Get the updated item directly
+        updated_item = Cart.get_item(user_id, id)
+
+        # Update just the changed item in the cart_items list
+        updated_cart_items =
+          Enum.map(socket.assigns.cart_items, fn cart_item ->
+            if cart_item.product.id == id do
+              updated_item
+            else
+              cart_item
+            end
+          end)
+
         {:ok, updated_cart_subtotal} = Cart.cart_subtotal(user_id)
 
         {:noreply,
          socket
-         |> put_flash(:info, message)
          |> assign(
            cart_items: updated_cart_items,
            cart_subtotal: updated_cart_subtotal
@@ -41,6 +51,7 @@ defmodule EcommerceWeb.CartLive do
     end
   end
 
+  # Similar update for decrease_quantity
   def handle_event("decrease_quantity", %{"id" => id}, socket) do
     user_id = socket.assigns.current_user.id
     id = String.to_integer(id)
@@ -49,21 +60,31 @@ defmodule EcommerceWeb.CartLive do
 
     if new_quantity > 0 do
       case Cart.change_quantity(id, user_id, new_quantity) do
-        {:ok, message} ->
-          updated_cart_items = Cart.get_cart(user_id).order_items
-          # Handle the returned tuple
+        {:ok, _message} ->
+          # Get the updated item directly
+          updated_item = Cart.get_item(user_id, id)
+
+          # Update just the changed item in the cart_items list
+          updated_cart_items =
+            Enum.map(socket.assigns.cart_items, fn cart_item ->
+              if cart_item.product.id == id do
+                updated_item
+              else
+                cart_item
+              end
+            end)
+
           {:ok, updated_cart_subtotal} = Cart.cart_subtotal(user_id)
 
           {:noreply,
            socket
-           |> put_flash(:info, message)
            |> assign(
              cart_items: updated_cart_items,
              cart_subtotal: updated_cart_subtotal
            )}
 
         {:error, reason} ->
-          {:noreply, put_flash(socket, :error, "Failed to increase quantity: #{reason}")}
+          {:noreply, put_flash(socket, :error, "Failed to decrease quantity: #{reason}")}
       end
     else
       {:noreply, socket}
@@ -97,6 +118,10 @@ defmodule EcommerceWeb.CartLive do
   def handle_event("apply_promo_code", %{"promo_code" => promo_code}, socket) do
     # Logic to apply promo code
     {:noreply, assign(socket, :promo_code, promo_code)}
+  end
+
+  def handle_event("proceed-checkout", _params, socket) do
+    {:noreply, push_navigate(socket, to: "/checkout")}
   end
 
   def render(assigns) do
@@ -194,7 +219,10 @@ defmodule EcommerceWeb.CartLive do
                   class="w-full p-2 border border-gray-300 rounded-lg mb-4"
                   phx-change="apply_promo_code"
                 />
-                <button class="bg-blue-700 text-white py-2 px-6 rounded-lg w-full">
+                <button
+                  phx-click="proceed-checkout"
+                  class="bg-blue-700 text-white py-2 px-6 rounded-lg w-full"
+                >
                   Proceed to checkout
                 </button>
               </div>

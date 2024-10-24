@@ -76,6 +76,7 @@ defmodule EcommerceWeb.Router do
       pipe_through [:browser, :require_authenticated_user]
 
       live "/cart", CartLive, :index
+      live "/checkout", PaymentsLive.CheckoutLive, :index
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end

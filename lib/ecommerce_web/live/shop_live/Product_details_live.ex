@@ -13,14 +13,15 @@ defmodule EcommerceWeb.ShopLive.ProductDetailsLive do
         token -> Accounts.get_user_by_session_token(token)
       end
 
-    {cart_count, in_cart} =
+    {cart_count, in_cart, item_quantity, cart_items} =
       if current_user do
-        {
-          Cart.count_cart_items(current_user.id),
-          Cart.item_in_cart?(current_user.id, id)
-        }
+        cart_count = Cart.count_cart_items(current_user.id)
+        in_cart = Cart.item_in_cart?(current_user.id, id)
+        item_quantity = if in_cart, do: Cart.get_quantity(current_user.id, id), else: 1
+        cart_items = Cart.get_cart(current_user.id).order_items
+        {cart_count, in_cart, item_quantity, cart_items}
       else
-        {0, false}
+        {0, false, 0, nil}
       end
 
     {:ok,
@@ -29,6 +30,8 @@ defmodule EcommerceWeb.ShopLive.ProductDetailsLive do
        current_user: current_user,
        cart_count: cart_count,
        in_cart: in_cart,
+       item_quantity: item_quantity,
+       cart_items: cart_items,
        promo_code: ""
      )}
   end
@@ -60,23 +63,73 @@ defmodule EcommerceWeb.ShopLive.ProductDetailsLive do
     end
   end
 
+  def handle_event("increase_quantity", %{"id" => id}, socket) do
+    user_id = socket.assigns.current_user.id
+    id = String.to_integer(id)
+    item = Cart.get_item(user_id, id)
+    new_quantity = item.quantity + 1
+
+    case Cart.change_quantity(id, user_id, new_quantity) do
+      {:ok, _message} ->
+        # Get updated quantity directly
+        updated_quantity = Cart.get_quantity(user_id, id)
+
+        {:noreply,
+         socket
+         |> assign(item_quantity: updated_quantity)}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to increase quantity: #{reason}")}
+    end
+  end
+
+  def handle_event("decrease_quantity", %{"id" => id}, socket) do
+    user_id = socket.assigns.current_user.id
+    id = String.to_integer(id)
+    item = Cart.get_item(user_id, id)
+    new_quantity = item.quantity - 1
+
+    if new_quantity > 0 do
+      case Cart.change_quantity(id, user_id, new_quantity) do
+        {:ok, _message} ->
+          # Get updated quantity directly
+          updated_quantity = Cart.get_quantity(user_id, id)
+
+          {:noreply,
+           socket
+           |> assign(item_quantity: updated_quantity)}
+
+        {:error, reason} ->
+          {:noreply, put_flash(socket, :error, "Failed to decrease quantity: #{reason}")}
+      end
+    else
+      {:noreply, socket}
+    end
+  end
+
   def handle_event("remove-from-cart", %{"id" => id}, socket) do
     user_id = socket.assigns.current_user.id
 
-    case Cart.delete_cart_item(user_id, id) do
+    case Cart.delete_cart_item(id, user_id) do
       {:ok, message} ->
-        count = Cart.count_cart_items(user_id)
+        updated_cart_items = Cart.get_cart(user_id).order_items
+        updated_cart_count = Cart.count_cart_items(user_id)
+
+        {:ok, updated_cart_subtotal} = Cart.cart_subtotal(user_id)
 
         {:noreply,
          socket
          |> put_flash(:info, message)
-         |> assign(socket, cart_count: count)}
+         |> assign(
+           in_cart: false,
+           cart_items: updated_cart_items,
+           cart_count: updated_cart_count,
+           cart_subtotal: updated_cart_subtotal
+         )}
 
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, "Failed to delete item: #{reason}")}
     end
-
-    {:ok, socket}
   end
 
   def handle_event("continue-shopping", _params, socket) do
@@ -131,19 +184,19 @@ defmodule EcommerceWeb.ShopLive.ProductDetailsLive do
                 <!-- Decrease Button -->
                 <button
                   phx-click="decrease_quantity"
-                  phx-value-id=""
+                  phx-value-id={@product.id}
                   class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-l-md sm:rounded-l-none sm:rounded-t-md focus:outline-none"
                 >
                   -
                 </button>
                 <!-- Quantity Display -->
-                <span class="px-4 py-2 bg-white text-gray-700 text-sm font-semibold border-t sm:border-l sm:border-r sm:border-gray-300">
-                  {item.quantity}
+                <span class="px-4 py-2 bg-white text-gray-700 text-sm font-semibold  sm:border-l sm:border-r sm:border-gray-300">
+                  <%= @item_quantity %>
                 </span>
                 <!-- Increase Button -->
                 <button
                   phx-click="increase_quantity"
-                  phx-value-id=""
+                  phx-value-id={@product.id}
                   class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-r-md sm:rounded-r-none sm:rounded-b-md focus:outline-none"
                 >
                   +
