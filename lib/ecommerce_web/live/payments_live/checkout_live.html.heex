@@ -136,54 +136,6 @@
             </div>
 
             <%= if @selected_payment_method do %>
-              <!-- Contact Information - Shown for both payment methods -->
-              <div class="space-y-4">
-                <h3 class="font-semibold">Contact Information</h3>
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <.input
-                      field={f[:first_name]}
-                      type="text"
-                      label="First Name"
-                      required
-                      placeholder="John"
-                    />
-                  </div>
-                  <div>
-                    <.input
-                      field={f[:last_name]}
-                      type="text"
-                      label="Last Name"
-                      required
-                      placeholder="Doe"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <.input
-                    field={f[:email]}
-                    type="email"
-                    label="Email"
-                    required
-                    placeholder="john@example.com"
-                  />
-                </div>
-
-                <div>
-                  <.input
-                    field={f[:phone_number]}
-                    type="tel"
-                    label="Phone Number"
-                    required
-                    placeholder="+254"
-                    pattern="^\+254[0-9]{9}$"
-                  />
-                  <p class="text-sm text-gray-500 mt-1">Format: +254XXXXXXXXX</p>
-                </div>
-              </div>
-
-              <div class="border-t border-gray-200 my-4"></div>
               <!-- Shipping Address - Shown for both payment methods -->
               <div class="space-y-4">
                 <h3 class="font-semibold">Shipping Address</h3>
@@ -254,6 +206,25 @@
                         maxlength="3"
                       />
                     </div>
+                  </div>
+                </div>
+              <% end %>
+
+              <%= if @selected_payment_method == "mpesa" do %>
+                <div class="border-t border-gray-200 my-4"></div>
+                <!-- Phone Number - Only shown for M-PESA payment -->
+                <div class="space-y-4">
+                  <h3 class="font-semibold">M-PESA Phone Number</h3>
+                  <div>
+                    <.input
+                      field={f[:phone_number]}
+                      type="tel"
+                      label="Phone Number"
+                      required
+                      placeholder="+254"
+                      pattern="^\+254[0-9]{9}$"
+                    />
+                    <p class="text-sm text-gray-500 mt-1">Format: +254XXXXXXXXX</p>
                   </div>
                 </div>
               <% end %>
