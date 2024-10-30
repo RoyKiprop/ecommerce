@@ -94,6 +94,8 @@ defmodule EcommerceWeb.Router do
       live "/home", HomeLive
       live "/shop", ProductLive, :index
       live "/shop/:id", ShopLive.ProductDetailsLive, :show
+      live "/about", AboutLive.Index, :index
+      live "/contact", ContactLive.Index, :index
     end
   end
 end

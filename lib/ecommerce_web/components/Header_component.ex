@@ -199,7 +199,7 @@ defmodule EcommerceWeb.HeaderComponent do
 
         <li>
           <.link
-            href="/"
+            href="/about"
             class="text-black hover:text-blue-800 focus:text-blue-800"
             role="navigation"
             method="get"
@@ -210,7 +210,7 @@ defmodule EcommerceWeb.HeaderComponent do
 
         <li>
           <.link
-            href="/"
+            href="/contact"
             class="text-black hover:text-blue-800 focus:text-blue-800"
             role="navigation"
             method="get"
