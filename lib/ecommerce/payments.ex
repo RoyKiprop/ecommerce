@@ -27,7 +27,8 @@ defmodule Ecommerce.Payment do
       :payment_method,
       :status,
       :transaction_id,
-      :order_id
+      :order_id,
+      :user_id
     ])
     |> validate_required([:amount, :payment_method, :status, :order_id])
     |> validate_inclusion(:status, ["pending", "completed", "failed"])

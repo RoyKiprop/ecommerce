@@ -10,18 +10,23 @@
         <!-- Text Section with slide-down animation -->
         <div class={"w-full md:w-1/2 space-y-6 transition-all duration-700 " <>
           if @current_slide == index, do: "animate-slide-down", else: ""}>
-          <h2 class="text-4xl font-bold w-[95%]"><%= slide.title %></h2>
-          <p class="text-xl text-gray-400 w-[90%]"><%= slide.description %></p>
-          <p class="text-xl text-gray-400"><%= slide.product.name %></p>
+          <h2 class="text-3xl text-white font-bold w-[90%]"><%= slide.title %></h2>
+          <p class="text-md text-gray-300 w-[90%]"><%= slide.description %></p>
+          <p class="text-lg text-gray-300"><%= slide.product.name %></p>
           <div class="flex space-x-4">
             <.link href={~p"/shop"}>
-              <button class="bg-blue-500 text-white px-4 py-2 rounded-md">View Product</button>
+              <button class="bg-blue-700 text-white px-4 py-2 rounded-md">View Product</button>
             </.link>
           </div>
         </div>
-        <!-- Image Section with slide-up animation -->
-        <div class={"w-full md:w-1/2 transition-all duration-700 " <>
-          if @current_slide == index, do: "animate-slide-up", else: ""}>
+        <!-- Image Section with slide-up animation and price tag -->
+        <div class={"relative w-full md:w-1/2 transition-all duration-700 " <>
+  if @current_slide == index, do: "animate-slide-up", else: ""}>
+          <!-- Price Tag -->
+          <div class="absolute top-4 right-4 bg-blue-700 text-white px-3 py-1 rounded-lg shadow-md">
+            KES <%= slide.product.price |> to_string() |> String.trim(".00") %> /=
+          </div>
+
           <img
             class="object-contain w-full h-48 md:h-auto"
             src={slide.product.image}

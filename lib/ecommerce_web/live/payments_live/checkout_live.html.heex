@@ -1,245 +1,319 @@
-<div class="min-h-screen bg-gray-50 p-8">
-  <div class="max-w-7xl mx-auto">
-    <div class="flex flex-col lg:flex-row gap-8">
-      <!-- Left Column - Order Summary -->
-      <div class="w-[45%]">
-        <div class="bg-white shadow-md rounded-lg">
-          <div class="p-4 border-b">
-            <h2 class="flex items-center gap-2 text-lg text-blue-500 font-semibold">
-              Order Summary
-            </h2>
-          </div>
-          <div class="p-4 space-y-4">
-            <%= for item <- @cart_items do %>
-              <div>
-                <div class="flex justify-between text-lg mb-4">
-                  <p class="font-medium"><%= item.product.name %></p>
-                  <p class="font-medium">
-                    <%= item.product.currency %> <%= item.discounted_price %>
-                  </p>
-                </div>
-                <p class="text-sm text-gray-500">Quantity: <%= item.quantity %></p>
-              </div>
-            <% end %>
-            <div class="border-t border-gray-200 mt-4"></div>
-            <div class="space-y-4">
-              <div class="flex justify-between">
-                <p class="text-gray-600">Subtotal</p>
-                <p>KES <%= @cart.sub_total %></p>
-              </div>
-              <div class="flex justify-between">
-                <p class="text-gray-600">Shipping</p>
-                <p>KES <%= @cart.shipping || 0 %></p>
-              </div>
-              <div class="flex justify-between">
-                <p class="text-gray-600">Tax</p>
-                <p>KES <%= @cart.tax || 0 %></p>
-              </div>
-              <div class="flex justify-between">
-                <p class="text-gray-600">Discount</p>
-                <p>KES <%= @cart.discount %></p>
-              </div>
-              <div class="border-t border-gray-200 mt-4"></div>
-              <div class="flex justify-between font-bold">
-                <p>Total</p>
-                <p>KES <%= @cart.total %></p>
-              </div>
+<.modal id="check-out">
+  <div
+    id="cart-modal"
+    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+  >
+    <div class="w-full max-w-7xl bg-white p-6 shadow-xl rounded-xl relative max-h-[95vh] overflow-y-auto custom-scrollbar">
+      <div class="flex justify-end w-full mb-2">
+        <button phx-click="close-checkout" class="text-black ">
+          <i class="bi bi-x-lg text-2xl"></i>
+        </button>
+      </div>
+
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Left Column - Order Summary -->
+        <div class="w-[45%]">
+          <div class="bg-white shadow-md rounded-lg">
+            <div class="p-4 border-b">
+              <h2 class="flex items-center gap-2 text-lg text-blue-500 font-semibold">
+                Order Summary
+              </h2>
             </div>
-            <%= if @cart.discount && @cart.discount > 0 do %>
-              <p class="text-md text-gray-600">
-                <span class="font-bold text-green-600">KES <%= @cart.discount %></span>
-                discount is applied for all goods worth over
-                <span class="font-bold text-red-500">100,000.</span>
-              </p>
-            <% end %>
+            <div class="p-4 space-y-4">
+              <%= for item <- @cart_items do %>
+                <div>
+                  <div class="flex justify-between text-lg mb-4">
+                    <p class="font-medium"><%= item.product.name %></p>
+                    <p class="font-medium">
+                      <%= item.product.currency %> <%= item.discounted_price %>
+                    </p>
+                  </div>
+                  <p class="text-sm text-gray-500">Quantity: <%= item.quantity %></p>
+                </div>
+              <% end %>
+              <div class="border-t border-gray-200 mt-4"></div>
+              <div class="space-y-4">
+                <div class="flex justify-between">
+                  <p class="text-gray-600">Subtotal</p>
+                  <p>KES <%= @cart.sub_total %></p>
+                </div>
+                <div class="flex justify-between">
+                  <p class="text-gray-600">Shipping</p>
+                  <p>KES <%= @cart.shipping || 0 %></p>
+                </div>
+                <div class="flex justify-between">
+                  <p class="text-gray-600">Tax</p>
+                  <p>KES <%= @cart.tax || 0 %></p>
+                </div>
+                <div class="flex justify-between">
+                  <p class="text-gray-600">Discount</p>
+                  <p>KES <%= @cart.discount %></p>
+                </div>
+                <div class="border-t border-gray-200 mt-4"></div>
+                <div class="flex justify-between font-bold">
+                  <p>Total</p>
+                  <p>KES <%= @cart.total %></p>
+                </div>
+              </div>
+              <%= if @cart.discount && @cart.discount > 0 do %>
+                <p class="text-md text-gray-600">
+                  <span class="font-bold text-green-600">KES <%= @cart.discount %></span>
+                  discount is applied for all goods worth over
+                  <span class="font-bold text-red-500">100,000.</span>
+                </p>
+              <% end %>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="lg:w-3/5">
-        <div class="bg-white shadow-md rounded-lg">
-          <div class="p-4 border-b">
-            <h2 class="flex items-center gap-2 text-lg font-semibold">
-              Payment Method
-            </h2>
-          </div>
-
-          <.form :let={f} for={@form} phx-submit="submit_payment" class="p-4 space-y-6">
-            <!-- Payment Method Selection -->
-            <div class="space-y-4">
-              <div class="grid grid-cols-2 gap-4">
-                <div class="relative">
-                  <input
-                    type="radio"
-                    name="payment_method"
-                    id="card"
-                    value="card"
-                    class="peer hidden"
-                    phx-click="select_payment_method"
-                  />
-                  <label
-                    for="card"
-                    class="block p-4 text-center border rounded-lg cursor-pointer hover:border-blue-500 peer-checked:border-blue-500 peer-checked:bg-blue-50"
-                  >
-                    <div class="flex items-center justify-center gap-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="w-6 h-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                        />
-                      </svg>
-                      Card Payment
-                    </div>
-                  </label>
-                </div>
-
-                <div class="relative">
-                  <input
-                    type="radio"
-                    name="payment_method"
-                    id="mpesa"
-                    value="mpesa"
-                    class="peer hidden"
-                    phx-click="select_payment_method"
-                  />
-                  <label
-                    for="mpesa"
-                    class="block p-4 text-center border rounded-lg cursor-pointer hover:border-blue-500 peer-checked:border-blue-500 peer-checked:bg-blue-50"
-                  >
-                    <div class="flex items-center justify-center gap-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="w-6 h-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-                        />
-                      </svg>
-                      M-PESA
-                    </div>
-                  </label>
-                </div>
-              </div>
+        <div class="lg:w-3/5">
+          <div class="bg-white shadow-md rounded-lg">
+            <div class="p-4 border-b">
+              <h2 class="flex items-center gap-2 text-lg font-semibold">
+                Payment Method
+              </h2>
             </div>
 
-            <%= if @selected_payment_method do %>
-              <!-- Shipping Address - Shown for both payment methods -->
+            <.form :let={f} for={@form} phx-submit="submit_payment" class="p-4 space-y-6">
+              <!-- Payment Method Selection -->
               <div class="space-y-4">
-                <h3 class="font-semibold">Shipping Address</h3>
-                <div>
-                  <.input
-                    field={f[:address]}
-                    type="text"
-                    label="Street Address"
-                    required
-                    placeholder="123 Main St"
-                  />
-                </div>
                 <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <.input
-                      field={f[:city]}
-                      type="text"
-                      label="City"
-                      required
-                      placeholder="Nairobi"
+                  <div class="relative">
+                    <input
+                      type="radio"
+                      name="payment_method"
+                      id="card"
+                      value="Card"
+                      class="peer hidden"
+                      phx-click="select_payment_method"
                     />
+                    <label
+                      for="card"
+                      class="block p-4 text-center border rounded-lg cursor-pointer hover:border-blue-500 peer-checked:border-blue-500 peer-checked:bg-blue-50"
+                    >
+                      <div class="flex items-center justify-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-6 h-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                          />
+                        </svg>
+                        Card Payment
+                      </div>
+                    </label>
                   </div>
-                  <div>
-                    <.input
-                      field={f[:postal_code]}
-                      type="text"
-                      label="Postal Code"
-                      required
-                      placeholder="00100"
+
+                  <div class="relative">
+                    <input
+                      type="radio"
+                      name="payment_method"
+                      id="mpesa"
+                      value="Mpesa"
+                      class="peer hidden"
+                      phx-click="select_payment_method"
                     />
+                    <label
+                      for="mpesa"
+                      class="block p-4 text-center border rounded-lg cursor-pointer hover:border-blue-500 peer-checked:border-blue-500 peer-checked:bg-blue-50"
+                    >
+                      <div class="flex items-center justify-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="w-6 h-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+                          />
+                        </svg>
+                        M-PESA
+                      </div>
+                    </label>
                   </div>
                 </div>
               </div>
 
-              <%= if @selected_payment_method == "card" do %>
-                <div class="border-t border-gray-200 my-4"></div>
-                <!-- Card Details - Only shown for card payment -->
+              <%= if @selected_payment_method do %>
+                <!-- Shipping Address - Shown for both payment methods -->
                 <div class="space-y-4">
-                  <h3 class="font-semibold">Card Information</h3>
+                  <h3 class="font-semibold">Shipping Address</h3>
                   <div>
                     <.input
-                      field={f[:card_number]}
+                      field={f[:address]}
                       type="text"
-                      label="Card Number"
+                      label="Street Address"
                       required
-                      placeholder="4242 4242 4242 4242"
-                      maxlength="19"
+                      placeholder="123 Main St"
                     />
                   </div>
-                  <div class="grid grid-cols-3 gap-4">
-                    <div class="col-span-2">
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
                       <.input
-                        field={f[:expiry]}
+                        field={f[:city]}
                         type="text"
-                        label="Expiry Date"
+                        label="City"
                         required
-                        placeholder="MM/YY"
-                        maxlength="5"
+                        placeholder="Nairobi"
                       />
                     </div>
                     <div>
                       <.input
-                        field={f[:cvc]}
+                        field={f[:postal_code]}
                         type="text"
-                        label="CVC"
+                        label="Postal Code"
                         required
-                        placeholder="123"
-                        maxlength="3"
+                        placeholder="00100"
                       />
                     </div>
                   </div>
                 </div>
-              <% end %>
 
-              <%= if @selected_payment_method == "mpesa" do %>
-                <div class="border-t border-gray-200 my-4"></div>
-                <!-- Phone Number - Only shown for M-PESA payment -->
-                <div class="space-y-4">
-                  <h3 class="font-semibold">M-PESA Phone Number</h3>
-                  <div>
-                    <.input
-                      field={f[:phone_number]}
-                      type="tel"
-                      label="Phone Number"
-                      required
-                      placeholder="+254"
-                      pattern="^\+254[0-9]{9}$"
-                    />
-                    <p class="text-sm text-gray-500 mt-1">Format: +254XXXXXXXXX</p>
+                <%= if @selected_payment_method == "Card" do %>
+                  <div class="border-t border-gray-200 my-4"></div>
+                  <!-- Card Details - Only shown for card payment -->
+                  <div class="space-y-4">
+                    <h3 class="font-semibold">Card Information</h3>
+                    <div>
+                      <.input
+                        field={f[:card_number]}
+                        type="text"
+                        label="Card Number"
+                        required
+                        placeholder="4242 4242 4242 4242"
+                        maxlength="19"
+                      />
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                      <div class="col-span-2">
+                        <.input
+                          field={f[:expiry]}
+                          type="text"
+                          label="Expiry Date"
+                          required
+                          placeholder="MM/YY"
+                          maxlength="5"
+                        />
+                      </div>
+                      <div>
+                        <.input
+                          field={f[:cvc]}
+                          type="text"
+                          label="CVC"
+                          required
+                          placeholder="123"
+                          maxlength="3"
+                        />
+                      </div>
+                    </div>
                   </div>
+                <% end %>
+
+                <%= if @selected_payment_method == "Mpesa" do %>
+                  <div class="border-t border-gray-200 my-4"></div>
+                  <!-- Phone Number - Only shown for M-PESA payment -->
+                  <div class="space-y-4">
+                    <h3 class="font-semibold">M-PESA Phone Number</h3>
+                    <div>
+                      <.input
+                        field={f[:phone_number]}
+                        type="tel"
+                        label="Phone Number"
+                        required
+                        placeholder="+254"
+                        pattern="^\+254[0-9]{9}$"
+                      />
+                      <p class="text-sm text-gray-500 mt-1">Format: +254XXXXXXXXX</p>
+                    </div>
+                  </div>
+                <% end %>
+
+                <div class="mt-6">
+                  <.button phx-disable-with="processing..." type="submit" class="w-full">
+                    Initiate Payment with <%= if @selected_payment_method == "Mpesa",
+                      do: "M-PESA",
+                      else: "Card" %>
+                  </.button>
                 </div>
               <% end %>
-
-              <div class="mt-6">
-                <.button type="submit" class="w-full">
-                  Pay KES <%= @cart.total %> with <%= if @selected_payment_method == "mpesa",
-                    do: "M-PESA",
-                    else: "Card" %>
-                </.button>
-              </div>
-            <% end %>
-          </.form>
+            </.form>
+          </div>
         </div>
       </div>
     </div>
+    <%= if @success_modal do %>
+      <div class="fixed inset-0 bg-black bg-opacity-70 z-40 flex items-center justify-center p-4">
+        <div class="relative z-50 w-full max-w-lg mx-auto bg-white p-8 rounded-xl shadow-xl">
+          <button
+            phx-click="close_modal"
+            class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+
+          <div class="flex flex-col items-center justify-center space-y-8">
+            <h2 class="text-2xl font-semibold text-black">
+              <%= @success_msg %>
+            </h2>
+            <i class="fas fa-check-circle text-6xl text-green-500"></i>
+            <div class="flex items-center space-x-4">
+              <button
+                phx-click="close_modal"
+                class="px-6 py-2.5 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors duration-200"
+              >
+                Close
+              </button>
+              <button
+                phx-click="view_receipt"
+                class="px-6 py-2.5 bg-blue-800 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              >
+                View Receipt
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%= if @error_modal do %>
+      <div class="fixed inset-0 z-40 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-gray-900 opacity-50"></div>
+
+        <div class="relative z-50 w-full max-w-lg mx-auto bg-white rounded-lg p-8 shadow-xl">
+          <button
+            phx-click="close_modal"
+            class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+
+          <div class="flex flex-col items-center justify-center space-y-8">
+            <h2 class="text-2xl font-semibold text-red-600">
+              <%= @error_msg %>
+            </h2>
+
+            <i class="fas fa-circle-xmark text-6xl text-red-500"></i>
+
+            <button
+              phx-click="close_modal"
+              class="px-8 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 font-medium"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    <% end %>
   </div>
-</div>
+</.modal>
