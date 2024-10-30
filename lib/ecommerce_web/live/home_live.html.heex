@@ -26,6 +26,9 @@
           <div class="absolute top-4 right-4 bg-blue-700 text-white px-3 py-1 rounded-lg shadow-md">
             KES <%= slide.product.price |> to_string() |> String.trim(".00") %> /=
           </div>
+          <div class="absolute top-0 left-0 bg-red-500 text-white text-xs px-5 py-2 rounded-br-lg z-10">
+            On Sale
+          </div>
 
           <img
             class="object-contain w-full h-48 md:h-auto"

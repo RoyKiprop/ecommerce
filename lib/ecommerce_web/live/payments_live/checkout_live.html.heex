@@ -241,9 +241,12 @@
 
                 <div class="mt-6">
                   <.button phx-disable-with="processing..." type="submit" class="w-full">
-                    Initiate Payment with <%= if @selected_payment_method == "Mpesa",
-                      do: "M-PESA",
-                      else: "Card" %>
+                    Pay KES <%= @cart.total |> to_string() |> String.trim(".00") %> with <%= if @selected_payment_method ==
+                                                                                                  "Mpesa",
+                                                                                                do:
+                                                                                                  "M-PESA",
+                                                                                                else:
+                                                                                                  "Card" %>
                   </.button>
                 </div>
               <% end %>

@@ -18,8 +18,50 @@ defmodule EcommerceWeb.ProductLive do
      assign(socket,
        products: products,
        cart_count: cart_count,
-       promo_code: ""
+       promo_code: "",
+       search: ""
      )}
+  end
+
+  def handle_event("search", %{"search" => name}, socket) do
+    searched_products =
+      if name == "" do
+        socket.assigns.products
+      else
+        socket.assigns.products
+        |> Enum.filter(fn product ->
+          String.contains?(
+            String.downcase(product.name),
+            String.downcase(name)
+          )
+        end)
+      end
+
+    {:noreply,
+     socket
+     |> assign(:products, searched_products)
+     |> assign(:search, name)}
+  end
+
+  def handle_event("submit", %{"search" => name}, socket) do
+    searched_products =
+      if name == " " do
+        socket.assigns.products
+      else
+        socket.assigns.products
+        |> Enum.filter(fn product ->
+          String.contains?(
+            String.downcase(product.name),
+            String.downcase(name)
+          )
+        end)
+      end
+
+    {:noreply,
+     socket
+     |> assign(:products, searched_products)
+     |> assign(:search, name)
+     |> put_flash(:info, "Showing results for #{name}")}
   end
 
   def handle_event("productDetails", %{"id" => id}, socket) do

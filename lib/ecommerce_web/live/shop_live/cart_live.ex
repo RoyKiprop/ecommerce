@@ -190,9 +190,6 @@ defmodule EcommerceWeb.CartLive do
                   </div>
 
                   <div class="flex space-x-8">
-                    <p class="font-semibold text-red-600 text-xl text-left thick-strike">
-                      <%= item.product.currency %> <%= item.price %>
-                    </p>
                     <p class="font-semibold text-green-600 text-xl text-left">
                       <%= item.product.currency %> <%= item.discounted_price %>
                     </p>

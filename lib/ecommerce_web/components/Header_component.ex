@@ -1,6 +1,7 @@
 defmodule EcommerceWeb.HeaderComponent do
   use Phoenix.Component
   alias EcommerceWeb.JSHelpers
+  import EcommerceWeb.CoreComponents
 
   def logo(assigns) do
     ~H"""
@@ -12,16 +13,22 @@ defmodule EcommerceWeb.HeaderComponent do
 
   def filter(assigns) do
     ~H"""
-    <div class="flex items-center w-full max-w-xl ">
+    <div class="flex items-center w-full max-w-xl">
       <div class="relative flex w-full">
-        <input
-          type="text"
-          placeholder="What are you looking for?"
-          class="w-full pl-4 pr-12 py-3 rounded-lg border-2 lack focus:outline-none focus:ring-2 focus:ring-blue-600 bg-black text-white"
-        />
-        <button class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white py-2 px-4 rounded-md border border-gray-300 hover:bg-gray-200">
-          <i class="fas fa-search"></i>
-        </button>
+        <.form for={%{}} phx-change="search" phx-submit="submit" class="w-full h-auto">
+          <.input
+            phx-debounce="300"
+            value=""
+            name="search"
+            type="text"
+            placeholder="What are you looking for?"
+            class="w-full pl-4 pr-16 py-5 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-black text-white"
+          />
+
+          <.button class="absolute right-0 top-1/2 transform -translate-y-1/2   bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+            <i class="fas fa-search"></i>
+          </.button>
+        </.form>
       </div>
     </div>
     """
@@ -102,72 +109,7 @@ defmodule EcommerceWeb.HeaderComponent do
 
   def category(assigns) do
     ~H"""
-    <div class="relative">
-      <button
-        phx-click={JSHelpers.toggle_category()}
-        class="text-black hover:text-blue-800 text-sm font-medium focus:text-blue-800"
-      >
-        <i class="fa fa-bars" aria-hidden="true"></i> CATEGORIES
-      </button>
-      <div
-        id="category-dropdown"
-        class="absolute hidden left-[-24px] mt-1 w-[200px] space-y-12 text-lg bg-black z-50 p-5 rounded-lg"
-        phx-click-away={JSHelpers.toggle_category()}
-      >
-        <div class="flex flex-col space-y-4 text-sm">
-          <.link
-            href="#"
-            class=" pb-3 border-white flex text-center"
-            role="menuitem"
-            tabindex="-1"
-            method="get"
-            id="user-menu-item-0"
-          >
-            Laptops
-          </.link>
-          <.link
-            href="#"
-            class=" pb-3 border-white flex items-center"
-            role="menuitem"
-            tabindex="-1"
-            method="get"
-            id="user-menu-item-1"
-          >
-            Samsung
-          </.link>
-          <.link
-            href="#"
-            class=" pb-3 border-white flex items-center"
-            role="menuitem"
-            tabindex="-1"
-            method="get"
-            id="user-menu-item-2"
-          >
-            iPhones
-          </.link>
-          <.link
-            href="#"
-            class=" pb-3 border-white flex items-center"
-            role="menuitem"
-            tabindex="-1"
-            method="get"
-            id="user-menu-item-3"
-          >
-            Desktop
-          </.link>
-          <.link
-            href="#"
-            class="pb-2 flex items-center"
-            role="menuitem"
-            tabindex="-1"
-            method="get"
-            id="user-menu-item-4"
-          >
-            Smart Watches
-          </.link>
-        </div>
-      </div>
-    </div>
+    <div class="relative"></div>
     """
   end
 

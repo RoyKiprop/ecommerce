@@ -7,6 +7,7 @@ defmodule EcommerceWeb.CheckoutLive do
   def mount(_params, _session, socket) do
     cart_items = Cart.get_cart(socket.assigns.current_user.id).order_items
     cart = Cart.get_cart(socket.assigns.current_user.id)
+    cart_count = Cart.count_cart_items(socket.assigns.current_user.id)
 
     {:ok,
      assign(socket,
@@ -18,7 +19,8 @@ defmodule EcommerceWeb.CheckoutLive do
        success_modal: false,
        error_msg: nil,
        success_msg: nil,
-       error_modal: false
+       error_modal: false,
+       cart_count: cart_count
      )}
   end
 

@@ -36,6 +36,10 @@ defmodule EcommerceWeb.ShopLive.ProductDetailsLive do
      )}
   end
 
+  def handle_event("search", _params, socket) do
+    {:noreply, push_navigate(socket, to: "/shop")}
+  end
+
   def handle_event("add-to-cart", %{"id" => id}, socket) do
     case socket.assigns.current_user do
       nil ->
